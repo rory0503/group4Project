@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    
+
+    {
+      "name": "Run FastAPI (main.py)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["main:app", "--reload"]
+    },
+    {
+      "name": "Run current file",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal"
+    }
+  ]
+}
