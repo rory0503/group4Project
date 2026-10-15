@@ -4,10 +4,11 @@ echo installing python...
 winget install Python.Python.3
 
 echo installing fastapi...
-python -m pip install fastapi[standard]
+python -m pip install fastapi[standard] --only-binary=:all:
 
 echo starting server...
 
-fastapi dev app/main.py
+python -m fastapi dev app/main.py
 
 pause
+
