@@ -1,0 +1,199 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Green AI Tracker Profile Page</title>
+
+
+    <!-- Add links to CSS and Js file here-->
+
+</head>
+
+<body>
+    <!-- Header at top of the page -->
+    <div id="heading">
+        <header>
+
+            <!-- The title-->
+            <h1>Green AI Tracker</h1>
+
+            <!--the nav bar -->
+            <div id="NavBar">
+                <nav>
+                    <a href="">Dashboard</a> <!--a link to the dashboard-->
+
+                    <a href="">Information</a> <!--a link to the Information page-->
+
+                    <a href="greenAiProfilePage.html">Profile</a> <!-- a link to the current page-->
+                </nav>
+            </div>
+
+
+        </header>
+    </div>
+
+    <br>
+
+    <main>
+
+        <!--An Account Preferences Banner-->
+        <h2>Account Preferences</h2>
+        <p>Manage your favourite models and customise your account settings</p>
+
+        <!--This page will have 5 Sections-->
+
+        <!--A User Side Bar element-->
+        <section id="userSideBar">
+            <span id="profilePic"></span>
+            <span id="username"></span>
+            <span id="userEmail"></span>
+        </section>
+
+        <!--Favourite Models element-->
+        <section id="favouriteModels">
+
+            <h3>Favourite Models</h3>
+
+            <span class="favouriteModel">
+                <span class="modelPicture"></span>
+                <span class="modelName"></span>
+                <span class="modelCompany"></span>
+                <button class="unfavouriteModel">★</button>
+            </span>
+
+        </section>
+
+        <!--Account Settings tab-->
+        <section id="accountSettings">
+
+            <h3>Settings</h3>
+            <form action="#" method="post" id="accountSettingsForm">
+
+                <!--Default Metric Setting-->
+                <div id="metricSetting">
+
+                    <h4>Default Metric</h4>
+                    <p>Choose your Prefered Metric For Graphs</p>
+
+                    <p>
+                        <select id="defaultMetric" name="defaultMetric">
+                            <option value="Water" selected>Water</option>
+                            <option value="Energy">Energy</option>
+                            <option value="Carbon">Carbon</option>
+                        </select>
+                    </p>
+
+                </div>
+
+                <hr>
+                <!--Default Time Range Setting-->
+                <div id="timeRangeSetting">
+
+                    <h4>Default Time Range</h4>
+                    <p>Set the default time range for data views</p>
+
+                    <p>
+                        <select id="defaultTimeRange" name="defaultTimeRange">
+                            <option value="perYear" selected>Per Year</option>
+                            <option value="perMonth">Per Month</option>
+                            <option value="perDay">Per Day</option>
+                            <option value="perPrompt">Per Basic Prompt</option>
+                            <option value="perToken">Per Token</option>
+                        </select>
+                    </p>
+
+                </div>
+
+                <hr>
+                <!--Language Setting-->
+                <div id="defaultLanguageSetting">
+
+                    <h4>Language</h4>
+                    <p>Chose your prefered language</p>
+
+                    <p>
+                        <select id="defaultLanguage" name="defaultLanguage">
+                            <option value="lang2" selected>English</option>
+                            <option value="lang3">Other Lang</option>
+                            <option value="lang4">Other Lang</option>
+                            <option value="lang5">Other Lang</option>
+                            <option value="lang6">Other Lang</option>
+                        </select>
+                    </p>
+
+                </div>
+
+                <hr>
+
+                <!--Theme (light/dark)-->
+                <div id="themeSetting">
+
+                    <h4>Theme</h4>
+                    <p>Choose your prefered colour scheme</p>
+
+                    <p>
+                        <select id="theme" name="theme">
+                            <option value="light" selected>Light</option>
+                            <option value="dark">dark</option>
+                        </select>
+                    </p>
+
+                </div>
+
+                <hr>
+
+                <!--Remember me Toggle-->
+                <div>
+
+                    <h4>Remember Me</h4>
+                    <p>Account remains logged in on this device</p>
+
+                    <fieldset>
+                        <p><label><input type="checkbox" name="rememberMe" value="yes" checked>Remember Me</label></p>
+                    </fieldset>
+
+                </div>
+            </form>
+
+        </section>
+
+        <!--Account Details-->
+        <section id="accountDetails">
+
+            <h3>Account Details</h3>
+            <hr>
+            Name<span id="accountName"></span>
+            <hr>
+            Email Address<span id="accountEmail"></span>
+            <hr>
+            Password<span id="accountPassword"></span> <!--Password should be blurred until shown-->
+            <hr>
+        </section>
+
+        <!--'Making a bigger impact' collumn with information-->
+        <section id="profileFillerBox">
+
+            <h3>Making a Bigger Impact</h3>
+
+            <p>
+                By tracking the energy, water and CO2 usage of AI models, you're helping to support more sustainable and
+                transparent decisions for a greater future.
+            </p>
+        </section>
+
+    </main>
+
+
+    <div id="footer">
+        <footer>
+            <nav>
+                <a href="">Source List</a> <!--Brings user to information page at sources-->
+
+                <a href="">Contact Information</a> <!--Brings user to information page at contact info-->
+            </nav>
+        </footer>
+    </div>
+</body>
+
+</html>
