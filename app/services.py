@@ -1,26 +1,8 @@
-from dataclasses import dataclass, field
 import requests
+from models.model import Model
+from models.provider import Provider
 
 BASE_URL = "https://api.ecologits.ai/v1beta"
-
-
-#raw api values. units: power kWh, co2 kgCO2eq, water litres
-@dataclass
-class Model:
-    name: str
-    power_consumption_min: float
-    power_consumption_max: float
-    co2_min: float
-    co2_max: float
-    water_usage_min: float
-    water_usage_max: float
-
-
-@dataclass
-class Provider:
-    name: str
-    models: list[Model] = field(default_factory=list)
-
 
 #all provider names
 def get_providers():
