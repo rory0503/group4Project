@@ -1,29 +1,31 @@
-import Header from "../Header.jsx"
-import Footer from "../Footer.jsx"
-import { currentUser } from "./userInformation.js";
-import ProfileSideBar from "./profileSideBar.jsx";
-import FavouriteModel from "./favouriteModels.jsx";
-import Settings from "./profileSettings.jsx";
-import './profile.css'
-import '../index.css'
+import { currentUser } from "../profilePage/userInformation.js";
+import ProfileSideBar from "../profilePage/profileSideBar.jsx";
+import FavouriteModel from "../profilePage/favouriteModels.jsx";
+import Settings from "../profilePage/profileSettings.jsx";
+import "../profilePage/profile.css";
 
 function Profile() {
   return (
-    <>
-      <Header />
+    <main id="main" className="page">
+      <div className="container">
+        <div className="page-head">
+          <div>
+            <h1>Account Preferences</h1>
+            <p>Manage your favourite models and customise your account settings.</p>
+          </div>
+        </div>
 
-      <div className="profile-page">
-        <ProfileSideBar user={currentUser} />
+        <div className="profile-page">
+          <ProfileSideBar user={currentUser} />
 
-        <div className="profile-content">
-          <FavouriteModel user={currentUser} />
-          <Settings user={currentUser} />
+          <div className="profile-content">
+            <FavouriteModel user={currentUser} />
+            <Settings user={currentUser} />
+          </div>
         </div>
       </div>
-
-      <Footer />
-    </>
+    </main>
   );
 }
 
-export default Profile
+export default Profile;
