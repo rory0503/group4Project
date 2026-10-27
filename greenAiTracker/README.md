@@ -20,3 +20,6 @@ If you are developing a production application, we recommend using TypeScript wi
 cd greenAiTracker
 npm run dev
 -- then copy link into a search bar and then it should load.
+
+## Actual Data
+Once we have the layout done for the website we need to get the real data stuck in and replace the sample data. Hopefully have the real data in for 3/11/26
