@@ -4,7 +4,7 @@ CREATE DATABASE green_ai
     COLLATE utf8mb4_unicode_ci;
 USE green_ai;
 
---Provider
+-- Provider
 
 CREATE TABLE Provider (
     ID                INT AUTO_INCREMENT PRIMARY KEY,
@@ -14,7 +14,7 @@ CREATE TABLE Provider (
     Water_Usage       FLOAT NOT NULL DEFAULT 0
 ) ENGINE=InnoDB;
 
---Model
+-- Model
 
 CREATE TABLE Model (
     ID                INT AUTO_INCREMENT PRIMARY KEY,
@@ -29,7 +29,7 @@ CREATE TABLE Model (
     CONSTRAINT uq_model_per_provider UNIQUE (Provider_ID, Name)
 ) ENGINE=InnoDB;
 
---User
+-- User
 
 CREATE TABLE `User` (
     ID       INT AUTO_INCREMENT PRIMARY KEY,
@@ -39,7 +39,7 @@ CREATE TABLE `User` (
     Language VARCHAR(10)  NOT NULL DEFAULT 'en'
 ) ENGINE=InnoDB;
 
---Saved_Model
+-- Saved_Model
 
 CREATE TABLE Saved_Model (
     Model_ID INT NOT NULL,
@@ -53,7 +53,7 @@ CREATE TABLE Saved_Model (
         ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
---User_Model
+-- User_Model
 CREATE TABLE User_Model (
     ID                INT AUTO_INCREMENT PRIMARY KEY,
     User_ID           INT NOT NULL,
