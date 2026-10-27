@@ -1,8 +1,8 @@
-import { currentUser } from "../profilePage/userInformation.js";
-import ProfileSideBar from "../profilePage/profileSideBar.jsx";
-import FavouriteModel from "../profilePage/favouriteModels.jsx";
-import Settings from "../profilePage/profileSettings.jsx";
-import "../profilePage/profile.css";
+import { currentUser } from "../data/userInformation.js";
+import ProfileSideBar from "../components/ProfileComponents/profileSideBar.jsx";
+import FavouriteModel from "../components/ProfileComponents/favouriteModels.jsx";
+import Settings from "../components/ProfileComponents/profileSettings.jsx";
+import "../styles/profile.css";
 
 function Profile() {
   return (
