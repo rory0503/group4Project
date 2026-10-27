@@ -1,0 +1,195 @@
+:root {
+    --green-900: #0f3d2e;
+    --green-800: #164a38;
+    --green-200: #bfe3c0;
+    --white: #fffefe;
+}
+
+/* Site Header Styling*/
+.site-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 80px;
+    padding: 0 32px 4px 24px;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    box-sizing: border-box;
+    background: var(--green-900);
+    border-bottom: 2px solid var(--green-800);
+    color: var(--white);
+    font-family: "Inter", system-ui, sans-serif;
+    filter: drop-shadow(5px 5px 10px var(--green-800));
+}
+
+.site-logo {
+    display: block;
+    flex: none;
+}
+
+.site-title {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: normal;
+    white-space: nowrap;
+}
+
+/* Nav */
+.site-nav {
+    margin-left: auto;
+    /* pushes nav to the right */
+}
+
+.site-nav ul {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.nav-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--white);
+    text-decoration: none;
+    opacity: 0.8;
+    transition: opacity 0.2s ease, background 0.2s ease;
+}
+
+.nav-link:hover,
+.nav-link:focus-visible {
+    opacity: 1;
+}
+
+/* Active page pill */
+.nav-link--active {
+    width: 110px;
+    height: 35px;
+    padding: 0;
+    font-size: 20px;
+    background: var(--green-800);
+    border: 1px solid var(--green-200);
+    border-radius: 3px;
+    opacity: 1;
+    box-sizing: border-box;
+}
+
+/* Language select */
+.site-nav li:last-child {
+    margin-left: 21px;
+    /* ~37px from the Profile pill */
+}
+
+#defaultLanguage {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 130px;
+    height: 35px;
+    padding: 0 24px 0 14px;
+    box-sizing: border-box;
+    font: inherit;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--white);
+    background-color: var(--green-800);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5' viewBox='0 0 9 5'%3E%3Cpath d='M1 1l3.5 3L8 1' fill='none' stroke='%23fffefe' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    border-radius: 3px;
+    background-position: right 12px center;
+    border: 1px solid var(--green-200);
+    cursor: pointer;
+}
+
+#defaultLanguage:focus-visible,
+.nav-link:focus-visible {
+    outline: 2px solid var(--green-200);
+    outline-offset: 3px;
+}
+
+#defaultLanguage option {
+    background: var(--green-800);
+    color: var(--white);
+}
+
+/* Footer Styling */
+.site-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 80px;
+    padding: 0 32px 4px 24px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    box-sizing: border-box;
+    background: var(--green-900);
+    border-bottom: 2px solid var(--green-800);
+    color: var(--white);
+    font-family: "Inter", system-ui, sans-serif;
+}
+
+.footer-info ul{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.footer-info {
+    margin: 60px;
+    /* pushes nav to the right */
+}
+
+.footer-info {
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px;
+    font-size: 15px;
+    font-weight: 550;
+    color: var(--white);
+    text-decoration: none;
+    opacity: 0.8;
+    transition: opacity 0.2s ease, background 0.2s ease;
+}
+
+.footer-info a:link {
+    color:var(--green-200);
+}
+
+
+
+
+/* for resizing */
+@media (max-width: 900px) {
+    .site-header {
+        padding: 0 16px 4px;
+    }
+
+    .site-title {
+        font-size: 22px;
+    }
+
+    .nav-link {
+        font-size: 16px;
+        padding: 0 8px;
+    }
+
+    .nav-link--active {
+        width: auto;
+        height: 40px;
+        padding: 0 18px;
+        font-size: 16px;
+    }
+}
