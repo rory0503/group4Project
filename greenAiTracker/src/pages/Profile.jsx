@@ -1,7 +1,6 @@
-  import { currentUser } from "../data/userInformation.js";
-  import ProfileSideBar from "../components/ProfileComponents/profileSideBar.jsx";
-  import FavouriteModel from "../components/ProfileComponents/favouriteModels.jsx";
-  import Settings from "../components/ProfileComponents/profileSettings.jsx";
+import ProfileSideBar from "../components/ProfileComponents/profileSideBar.jsx";
+import FavouriteModel from "../components/ProfileComponents/favouriteModels.jsx";
+import Settings from "../components/ProfileComponents/profileSettings.jsx";
 
 function Profile() {
   return (
@@ -15,11 +14,8 @@ function Profile() {
         </div>
 
         <div className="profile-page">
-          <ProfileSideBar user={currentUser} />
 
           <div className="profile-content">
-            <FavouriteModel user={currentUser} />
-            <Settings user={currentUser} />
           </div>
         </div>
       </div>

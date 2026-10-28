@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { Info, Download, ArrowRight, X } from "lucide-react";
 import useLocalStorage from "../hooks/useLocalStorage";
 import useModels from "../hooks/useModels";
