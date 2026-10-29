@@ -1,5 +1,6 @@
 import LoginSignup from "../components/LoginComponents/LoginSignUpField";
 import LoginSummaryCard from "../components/LoginComponents/WebsiteSummary";
+import "../styles/login.css";
 
 export default function Login() {
   return (
@@ -10,14 +11,19 @@ export default function Login() {
           <p>Track the environmental impact of AI</p>
         </div>
 
-        <LoginSummaryCard />
+        // cards side by side
+        <div className="auth">
+          <LoginSummaryCard />
+          <LoginSignup
+            onLogin={(user) => {
+              navigate("/profile");
+            }}
 
-
-        <LoginSignup
-          onLogin={(user) => { setCurrentUserId(user.id); navigate("/profile"); }}
           onGoogleSignIn={() => { }}      // optional
-          onForgotPassword={() => { }}    // optional
-        />
+          onForgotPassword={() => { }}  
+          
+          />
+        </div>
       </div>
     </main>
   );

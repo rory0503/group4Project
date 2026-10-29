@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Lightbulb, ChevronLeft, ChevronRight } from "lucide-react";
 
+//roatating card that shows one suistainability tip at a time. The user can click to go to the next or previous tip, or click the dots to jump to a specific tip. The tips automatically rotate every 10 seconds unless the user hovers over the card or focuses it with the keyboard.
 export default function TipsElement({ tips }) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -16,11 +17,13 @@ export default function TipsElement({ tips }) {
   }, [paused, index, tips.length]);
 
   if (tips.length === 0) return null;
-
+  //current tip.
   const tip = tips[index];
+  // jump to a specific tip.
   const go = (i) => setIndex((i + tips.length) % tips.length);
 
   return (
+    // pauses the auto-rotation when a mouse hovers over the card or button.
     <div
       className="card tip"
       aria-roledescription="carousel"
@@ -37,8 +40,10 @@ export default function TipsElement({ tips }) {
       </div>
 
       <div className="tip-controls">
+        {/* links tips to information page. */}
         <Link className="link-btn" to="/information#tips">Learn more</Link>
 
+        {/* one dot per tip, dot for currently selected tip is highlighted */}
         <div className="dots" role="group" aria-label="Choose tip">
           {tips.map((_, i) => (
             <button
@@ -51,7 +56,7 @@ export default function TipsElement({ tips }) {
             />
           ))}
         </div>
-
+        {/* arrows for previous and next tip. */}
         <div className="tip-nav">
           <button className="page-btn" type="button" aria-label="Previous tip" onClick={() => go(index - 1)}>
             <ChevronLeft className="icon icon-sm" />

@@ -3,6 +3,8 @@ import { compact } from "../../lib/helpers";
 
 const ICONS = { droplet: Droplet, zap: Zap, cloud: Cloud };
 
+//single statcard showing a single metric.
+// the models value is formatted for display and the difference from average is calculated.
 export default function StatCard({ meta, model, average }) {
   const Icon = ICONS[meta.icon];
   const v = compact(meta.key, model[meta.key]);
@@ -10,6 +12,7 @@ export default function StatCard({ meta, model, average }) {
   const good = pct <= 0;
 
   return (
+    //sets the statcads colour and displays information, also gives it green if above average or amber is below average.
     <article className="card stat" style={{ "--c": `var(${meta.color})` }}>
       <div className="stat-top">
         <span className="stat-label">

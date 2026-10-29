@@ -7,6 +7,7 @@ import exportCsv from "../lib/exportCsv";
 import ModelPicker from "../components/ModelPicker";
 // ModelTable import removed: the paginated file imports it itself
 import CycleModelTable from "../components/RankingsComponents/cycleRankings.jsx";
+import "../styles/rankings.css";
 
 export default function Rankings() {
   const { models, loading, error } = useModels();

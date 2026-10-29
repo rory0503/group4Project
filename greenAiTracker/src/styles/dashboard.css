@@ -1,0 +1,127 @@
+/* ---------- Stat cards ---------- */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.stat {
+  position: relative;
+  overflow: hidden;
+}
+.stat::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--c);
+}
+.stat-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.stat .badge {
+  white-space: nowrap;
+}
+.stat-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  color: var(--text-2);
+  font-size: 15px;
+}
+.stat-value {
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--heading);
+  margin: 14px 0 4px;
+}
+.stat-value small {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-left: 4px;
+  letter-spacing: 0;
+}
+.stat-scope {
+  font-size: 14px;
+  color: var(--muted);
+}
+.stat-scope strong {
+  color: var(--text-2);
+  font-weight: 600;
+}
+@media (max-width: 860px) {
+  .stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Tips carousel ---------- */
+.tip {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 16px 20px;
+  align-items: start;
+}
+.tip-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: var(--primary);
+  color: var(--on-primary);
+}
+.tip h3 {
+  font-size: 18px;
+  margin-bottom: 6px;
+}
+.tip p {
+  color: var(--text-2);
+}
+.tip-controls {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+  margin-top: 4px;
+}
+.dots {
+  display: flex;
+  gap: 4px;
+}
+.dot {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  background: none;
+  display: grid;
+  place-items: center;
+  padding: 0;
+}
+.dot::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--green-300);
+  transition:
+    width 0.2s var(--ease),
+    background-color 0.2s;
+}
+.dot[aria-current="true"]::before {
+  width: 22px;
+  background: var(--primary);
+}
+.tip-nav {
+  display: flex;
+  gap: 6px;
+}

@@ -1,6 +1,7 @@
 import ProfileSideBar from "../components/ProfileComponents/profileSideBar.jsx";
 import FavouriteModel from "../components/ProfileComponents/favouriteModels.jsx";
 import Settings from "../components/ProfileComponents/profileSettings.jsx";
+import "../styles/profile.css";
 
 function Profile() {
   return (

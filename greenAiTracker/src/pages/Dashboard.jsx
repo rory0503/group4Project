@@ -11,6 +11,7 @@ import TipsElement from "../components/DashboardComponents/TipsElement";
 import MetricPicker from "../components/MetricPicker";
 import ModelPicker from "../components/ModelPicker";
 import ModelTable from "../components/ModelTable";
+import "../styles/dashboard.css";
 
 export default function Dashboard() {
   const { models, loading, error } = useModels();
@@ -21,6 +22,7 @@ export default function Dashboard() {
   const [range, setRange] = useState("all");
   const [sort, setSort] = useState({ key: "score", dir: "desc" });
 
+  // find model by id or default to first model
   const model = byId(models, primaryId) ?? models[0];
   const meta = METRICS[metric];
 
@@ -33,12 +35,13 @@ export default function Dashboard() {
     }));
   }
 
-  // The top 3 models by score, plus the models being viewed
+  // The top 3 models by score, plus the models being viewed, which is displayed at top of table.
   const ids = new Set(sortModels(models, "score", "desc").slice(0, 3).map((m) => m.id));
   if (model) ids.add(model.id);
   if (secondId) ids.add(secondId);
   const tableModels = sortModels(models.filter((m) => ids.has(m.id)), sort.key, sort.dir);
 
+    //message at top of page containing chosen models name.
   return (
     <main id="main" className="page">
       <div className="container">
@@ -52,18 +55,21 @@ export default function Dashboard() {
           <span className="badge"><Info className="icon icon-sm" />Illustrative sample data</span>
         </div>
 
+        {/* There for when the backend is connected, showing if the data is loading, if there is an error or if there are no models available. */}
         {loading && <p className="card">Loading model data…</p>}
         {error && <div className="notice">We couldn't load the model data. Try again in a moment.</div>}
         {!loading && !error && !model && <p className="card">No models are available yet.</p>}
 
+        {/* If a model is selected, show the dashboard content. */}
         {model && (
           <>
+            {/* statcards for each metric of model. */}
             <section className="stats" aria-label="Key figures">
               {Object.values(METRICS).map((m) => (
                 <StatCard key={m.key} meta={m} model={model} average={average(models, m.key)} />
               ))}
             </section>
-
+            {/* model picker. */}
             <section className="section" aria-labelledby="trend-title">
               <div className="toolbar">
                 <div className="field">
@@ -76,7 +82,7 @@ export default function Dashboard() {
                     exclude={secondId ? [secondId] : []}
                   />
                 </div>
-
+                {/* model picker for comparison. */}
                 <div className="field">
                   <span className="label">Compare with <span className="hint">(optional)</span></span>
                   <div style={{ display: "flex", gap: 8 }}>
@@ -102,7 +108,7 @@ export default function Dashboard() {
                     )}
                   </div>
                 </div>
-
+                {/* change view of the chart to be per year or cumulative. - if possible with backend data */}
                 <div className="field">
                   <label className="label" htmlFor="mode">View</label>
                   <select className="select" id="mode" value={mode} onChange={(e) => setMode(e.target.value)}>
@@ -110,7 +116,7 @@ export default function Dashboard() {
                     <option value="cumulative">Cumulative</option>
                   </select>
                 </div>
-
+                {/* time range for graph. */}
                 <div className="field">
                   <label className="label" htmlFor="range">Time range</label>
                   <select className="select" id="range" value={range} onChange={(e) => setRange(e.target.value)}>
@@ -137,13 +143,14 @@ export default function Dashboard() {
                 </div>
               </div>
             </section>
-
+            {/* table info. */}
             <section className="section" aria-labelledby="table-title">
               <div className="section-head">
                 <div>
                   <h2 id="table-title">How it ranks</h2>
                   <p>Top 3 models by sustainability score, plus the model you're viewing.</p>
                 </div>
+                {/* export data button. */}
                 <button className="btn btn-outline" type="button" onClick={() => exportCsv(models)}>
                   <Download className="icon icon-sm" />Export data
                 </button>
@@ -162,6 +169,7 @@ export default function Dashboard() {
               </Link>
             </section>
 
+            {/* tips element at bottom of webpage. */}
             <section className="section" aria-labelledby="tips-title">
               <div className="section-head">
                 <h2 id="tips-title">Sustainable AI prompt tips</h2>
