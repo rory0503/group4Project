@@ -1,6 +1,6 @@
-import ProfileSideBar from "../components/ProfileComponents/profileSideBar.jsx";
-import FavouriteModel from "../components/ProfileComponents/favouriteModels.jsx";
-import Settings from "../components/ProfileComponents/profileSettings.jsx";
+import ProfileSideBar from "../components/ProfileComponents/profileSideBar";
+import FavouriteModel from "../components/ProfileComponents/favouriteModels";
+import Settings from "../components/ProfileComponents/profileSettings";
 import "../styles/profile.css";
 
 function Profile() {
@@ -15,6 +15,7 @@ function Profile() {
         </div>
 
         <div className="profile-page">
+
 
           <div className="profile-content">
           </div>

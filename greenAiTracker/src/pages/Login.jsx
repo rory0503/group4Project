@@ -2,9 +2,11 @@ import LoginSignup from "../components/LoginComponents/LoginSignUpField";
 import LoginSummaryCard from "../components/LoginComponents/WebsiteSummary";
 import "../styles/login.css";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   return (
     <main id="main" className="page">
@@ -18,7 +20,8 @@ export default function Login() {
         <div className="auth">
           <LoginSummaryCard />
           <LoginSignup
-            onLogin={(user) => {
+            onLogin={(user, remember) => {
+              login(user, remember);
               navigate("/profile");
             }}
 
