@@ -9,14 +9,14 @@
     box-sizing: border-box;
     max-width: 1240px;                              /* ≈ the Figma layout width */
     margin: 0 auto;                                 /* centres it on any screen */
-    padding: 126px 40px 60px;                       /* 80px fixed header + 46px gap on top */
+    padding:40px;                       /* 80px fixed header + 46px gap on top */
 }
 
 /* The two cards sit side by side and share the width equally */
 .profile-content {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
+    gap: 16px;
     align-items: start;
 }
 
