@@ -1,8 +1,11 @@
 import LoginSignup from "../components/LoginComponents/LoginSignUpField";
 import LoginSummaryCard from "../components/LoginComponents/WebsiteSummary";
 import "../styles/login.css";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
+  const navigate = useNavigate();
+
   return (
     <main id="main" className="page">
       <div className="container">
@@ -11,7 +14,7 @@ export default function Login() {
           <p>Track the environmental impact of AI</p>
         </div>
 
-        // cards side by side
+        {/*cards side by side*/}
         <div className="auth">
           <LoginSummaryCard />
           <LoginSignup
