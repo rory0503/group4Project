@@ -1,18 +1,16 @@
 /* ---------- Page layout ---------- */
 
-/* Centred container: sidebar + content */
 .profile-page {
     display: grid;
-    grid-template-columns: 206px minmax(0, 1fr);   /* fixed sidebar, flexible content */
+    grid-template-columns: 206px minmax(0, 1fr);
     gap: 28px;
     align-items: start;
     box-sizing: border-box;
-    max-width: 1240px;                              /* ≈ the Figma layout width */
-    margin: 0 auto;                                 /* centres it on any screen */
-    padding:40px;                       /* 80px fixed header + 46px gap on top */
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 40px;
 }
 
-/* The two cards sit side by side and share the width equally */
 .profile-content {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -25,14 +23,15 @@
 
 .sidebar {
     width: 206px;
-    min-height: 500px;         /* or 110px while it only holds the profile */
-    margin: 0;                 /* position now comes from the grid */
+    min-height: 500px;
+    margin: 0;
     box-sizing: border-box;
-    background: #f0f6ee;
-    border: 2px solid #7ca982;
+    background: var(--surface);
+    border: 2px solid var(--border);
     border-radius: 10px;
     font-family: "Inter", sans-serif;
-    color: var(--green-900);
+    color: var(--heading);
+    box-shadow: var(--shadow-sm);
 }
 
 .sidebar-profile {
@@ -43,7 +42,7 @@
     box-sizing: border-box;
     padding: 0 13px;
     min-width: 0;
-    border-bottom: 1px solid #7ca982;
+    border-bottom: 1px solid var(--border);
 }
 
 .sidebar-profile__pic {
@@ -52,7 +51,7 @@
     flex-shrink: 0;
     border-radius: 50%;
     object-fit: cover;
-    background: var(--green-900);
+    background: var(--primary);
 }
 
 .sidebar-profile__text {
@@ -66,6 +65,7 @@
     font-size: 14px;
     font-weight: 700;
     line-height: normal;
+    color: var(--heading);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -75,6 +75,7 @@
     font-size: 10px;
     font-weight: 500;
     line-height: normal;
+    color: var(--muted);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -84,13 +85,14 @@
 
 .settings {
     box-sizing: border-box;
-    width: 100%;               /* fills its grid column (was 460px) */
+    width: 100%;
     min-height: 500px;
-    background: #f0f6ee;
-    border: 2px solid #7ca982;
+    background: var(--surface);
+    border: 2px solid var(--border);
     border-radius: 10px;
     font-family: "Inter", sans-serif;
-    color: #0f3d2e;
+    color: var(--heading);
+    box-shadow: var(--shadow-sm);
 }
 
 .settings-header {
@@ -100,7 +102,7 @@
     height: 71px;
     box-sizing: border-box;
     padding: 0 21px;
-    border-bottom: 1px solid #7ca982;
+    border-bottom: 1px solid var(--border);
 }
 
 .settings-header__icon {
@@ -112,6 +114,7 @@
     margin: 0;
     font-size: 22px;
     font-weight: 700;
+    color: var(--heading);
 }
 
 .settings-row {
@@ -121,7 +124,7 @@
     height: 80px;
     box-sizing: border-box;
     padding: 0 21px;
-    border-bottom: 1px solid #7ca982;
+    border-bottom: 1px solid var(--border);
 }
 
 .settings-row:last-child {
@@ -134,6 +137,7 @@
     justify-content: center;
     flex-shrink: 0;
     width: 35px;
+    color: var(--heading);          /* lets inline SVG icons using currentColor follow the theme */
 }
 
 .settings-row__icon img {
@@ -154,12 +158,14 @@
     margin: 0;
     font-size: 16px;
     font-weight: 600;
+    color: var(--heading);
 }
 
 .settings-row__description {
     margin: 0;
     font-size: 14px;
     font-weight: 600;
+    color: var(--text-2);
 }
 
 .settings-row__control {
@@ -174,22 +180,25 @@
     height: 31px;
     box-sizing: border-box;
     padding: 0 28px 0 12px;
-    background-color: #f0f6ee;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%230f3d2e' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    border: 1px solid #7ca982;
+    background-color: var(--surface-2);
+    /* Chevron is drawn with a CSS mask so it can follow the theme colour */
+    background-image: none;
+    border: 1px solid var(--border);
     border-radius: 5px;
     font-family: inherit;
     font-size: 11px;
     font-weight: 600;
-    color: #0f3d2e;
+    color: var(--heading);
     cursor: pointer;
+}
+
+.settings-control-wrap {            /* optional wrapper, see note below */
+    position: relative;
 }
 
 .settings-select:focus-visible,
 .settings-toggle:focus-visible {
-    outline: 2px solid #164a38;
+    outline: 2px solid var(--primary);
     outline-offset: 2px;
 }
 
@@ -199,15 +208,15 @@
     width: 67px;
     height: 31px;
     padding: 0;
-    background: #b9cdb9;
+    background: var(--surface-3);
     border: none;
     border-radius: 999px;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background-color 0.2s;
 }
 
 .settings-toggle--on {
-    background: #164a38;
+    background: var(--primary);
 }
 
 .settings-toggle__knob {
@@ -216,8 +225,9 @@
     left: 3px;
     width: 25px;
     height: 25px;
-    background: #fff;
+    background: var(--on-primary);
     border-radius: 50%;
+    box-shadow: var(--shadow-sm);
     transition: transform 0.2s;
 }
 
@@ -237,13 +247,131 @@
     bottom: 0;
     width: 10px;
     box-sizing: border-box;
-    background: #f0f6ee;
-    border: 2px solid #0f3d2e;
+    background: var(--surface);
+    border: 2px solid var(--heading);
 }
 
 .metric-icon__bar--short { left: 0;    height: 10px; }
 .metric-icon__bar--mid   { left: 11px; height: 20px; }
 .metric-icon__bar--tall  { left: 22px; height: 30px; }
+
+/* ---------- Favourite Models card ---------- */
+
+.favourites {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 500px;
+    padding: 15px 21px 21px;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-family: "Inter", sans-serif;
+    color: var(--heading);
+    box-shadow: var(--shadow-sm);
+}
+
+.favourites-heading-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.favourites-heading {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--heading);
+}
+
+.favourites-subheading {
+    margin: 6px 0 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-2);
+}
+
+.favourites-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.favourites-empty {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-2);
+}
+
+.model-card {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    height: 78px;
+    padding: 0 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+
+.model-card__icon {
+    width: 55px;
+    height: 50px;
+    flex-shrink: 0;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.model-card__text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.model-card__name {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--heading);
+}
+
+.model-card__company {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-2);
+}
+
+.star-button {
+    display: flex;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--primary);
+}
+
+.star-button:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* Star icon */
+.star-icon path {
+    fill: none;
+    stroke: var(--primary);
+    stroke-width: 1.5;
+    stroke-linejoin: round;
+}
+
+.star-icon--filled path {
+    fill: var(--primary);
+}
 
 /* Very large desktop monitors: allow the layout to grow */
 @media (min-width: 1700px) {
