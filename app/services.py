@@ -1,6 +1,6 @@
 import requests
-from models.model import Model
-from models.provider import Provider
+from app.models.model import Model
+from app.models.provider import Provider
 
 BASE_URL = "https://api.ecologits.ai/v1beta"
 
@@ -29,8 +29,14 @@ def _min_max(impacts, key):
 
     return value, value
 
+#the erd has one column per impact, so a model stores the midpoint of min and max
+def _midpoint(impacts, key):
+    value_min, value_max = _min_max(impacts, key)
 
-#impact estimate for one model
+    return (value_min + value_max) / 2
+
+
+#impact estimate for one model, as a Model object the values are power kWh, co2 kgCO2eq, water in litres
 def get_model_data(provider, model, output_token_count=300, electricity_mix_zone="WOR"):
     headers = {
         "accept": "application/json",
@@ -49,18 +55,11 @@ def get_model_data(provider, model, output_token_count=300, electricity_mix_zone
 
     impacts = response.json()["impacts"]
 
-    power_min, power_max = _min_max(impacts, "energy")
-    co2_min, co2_max = _min_max(impacts, "gwp")
-    water_min, water_max = _min_max(impacts, "wcf")
-
     return Model(
-        name=model,
-        power_consumption_min=power_min,
-        power_consumption_max=power_max,
-        co2_min=co2_min,
-        co2_max=co2_max,
-        water_usage_min=water_min,
-        water_usage_max=water_max,
+        Name=model,
+        Power_Consumption=_midpoint(impacts, "energy"),
+        Co2=_midpoint(impacts, "gwp"),
+        Water_Usage=_midpoint(impacts, "wcf"),
     )
 
 
@@ -78,6 +77,6 @@ def collect_data(**estimation_options):
             except requests.RequestException as error:
                 print(f"Skipping {provider_name}/{model_name}: {error}")
 
-        providers.append(Provider(provider_name, models))
+                providers.append(Provider(name=provider_name, models=models))
 
     return providers
