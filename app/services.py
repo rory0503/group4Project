@@ -66,9 +66,9 @@ def get_model_data(provider, model, output_token_count=300, electricity_mix_zone
 #every model of every provider, as a list of Provider objects
 def collect_data(**estimation_options):
     providers = []
+    models = []
 
     for provider_name in get_providers():
-        models = []
 
         for model_name in get_models(provider_name):
             #skip models the api can't estimate, or that time out / lose connection
@@ -79,4 +79,4 @@ def collect_data(**estimation_options):
 
                 providers.append(Provider(name=provider_name, models=models))
 
-    return providers
+    return models
