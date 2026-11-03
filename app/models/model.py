@@ -1,11 +1,16 @@
-from dataclasses import dataclass, field
-#raw api values. units: power kWh, co2 kgCO2eq, water litres
-@dataclass
-class Model:
-    name: str
-    power_consumption_min: float
-    power_consumption_max: float
-    co2_min: float
-    co2_max: float
-    water_usage_min: float
-    water_usage_max: float
+from sqlalchemy import Column, Integer, String, Float, ForeignKey
+from sqlalchemy.orm import relationship
+from app.databaseConfig import Base
+
+class Model(Base):
+    __tablename__ = "model"
+
+    id = Column(Integer, primary_key=True, index=True)
+    Name = Column(String(100), nullable=False)
+    Power_Consumption = Column(Integer)
+    Co2 = Column(Float, nullable=False)
+    Water_Usage = Column(Float, nullable=False)
+
+
+    Provider_ID = Column(Integer, ForeignKey("providers.id"))
+    Provider = relationship("Provider", back_populates="Models")

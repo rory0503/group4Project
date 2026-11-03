@@ -1,6 +1,7 @@
 import requests
 from app.models.model import Model
 from app.models.provider import Provider
+from app.database import saveProvider
 
 BASE_URL = "https://api.ecologits.ai/v1beta"
 
@@ -62,21 +63,31 @@ def get_model_data(provider, model, output_token_count=300, electricity_mix_zone
         Water_Usage=_midpoint(impacts, "wcf"),
     )
 
+def get_provider_data(providerName):
+    modelNames = get_models(providerName)
+    models = []
+
+    for modelName in modelNames:
+        model = get_model_data(providerName, modelName)
+        models.append(model)
+
+    return Provider(
+        Name = providerName,
+        Models = models
+    )
+
 
 #every model of every provider, as a list of Provider objects
 def collect_data(**estimation_options):
     providers = []
-    models = []
+    providerNames = get_providers()
 
-    for provider_name in get_providers():
+    i = 0
 
-        for model_name in get_models(provider_name):
-            #skip models the api can't estimate, or that time out / lose connection
-            try:
-                models.append(get_model_data(provider_name, model_name, **estimation_options))
-            except requests.RequestException as error:
-                print(f"Skipping {provider_name}/{model_name}: {error}")
+    for providerName in providerNames:
+        provider = get_provider_data(providerName)
+        providers.append(provider)
+        i+=1
+        print(str(i) + " " + str(provider))
 
-                providers.append(Provider(name=provider_name, models=models))
-
-    return models
+    return providers

@@ -1,7 +1,11 @@
-from dataclasses import dataclass, field
-@dataclass
-class Provider:
-    name: str
-    models: list[Model] = field(default_factory=list)
+from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import relationship
+from app.databaseConfig import Base
 
-#can ignore model not being defined, define it whenever you create a provider in another file not here
+class Provider(Base):
+    __tablename__ = "providers"
+
+    id = Column(Integer, primary_key=True, index=True)
+    Name = Column(String(100), nullable=False)
+
+    Models = relationship("Model", back_populates="Provider")

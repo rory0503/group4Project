@@ -1,11 +1,14 @@
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.databaseConfig import Base, engine
 
 from app.routers import api_router
 
 PROJECT_NAME = os.getenv("PROJECT_NAME", "AI Environmental Impact Tracker")
 API_V1_STR = "/api/v1"
+
+Base.metadata.create_all(bind=engine)
 
 ALLOWED_ORIGINS = [
     "http://localhost:8000",
