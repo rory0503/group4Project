@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { getUserByEmail, addUser } from "../../data/userInformation.js";
+import GoogleSignInButton from "./GoogleSignInButton";
+
 
 // The right-hand card on the Login page: Log in / Sign up tabs and the form.
 export default function LoginSignup({ onLogin, onGoogleSignIn, onForgotPassword }) {
@@ -37,6 +39,22 @@ export default function LoginSignup({ onLogin, onGoogleSignIn, onForgotPassword 
         user = addUser({ name: name.trim(), email: email.trim(), password });
       }
       // Hand the user to the parent page
+      if (onLogin) onLogin(user, remember);
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
+  function handleGoogleSignIn(googleUser) {
+    setError("");
+    try {
+      const user =
+        getUserByEmail(googleUser.email) ??
+        addUser({
+          name: googleUser.name || googleUser.email,
+          email: googleUser.email,
+          password: crypto.randomUUID(),
+        });
       if (onLogin) onLogin(user, remember);
     } catch (err) {
       setError(err.message);
@@ -144,11 +162,7 @@ export default function LoginSignup({ onLogin, onGoogleSignIn, onForgotPassword 
 
         <div className="divider">or continue with</div>
 
-        <button className="btn btn-outline btn-block" type="button" onClick={onGoogleSignIn}>
-          <span className="g-mark" aria-hidden="true">G</span>
-          {isLogin ? "Continue with Google" : "Sign up with Google"}
-        </button>
-
+        <GoogleSignInButton onSignIn={handleGoogleSignIn} />
         {/* Link to switch tabs */}
         <p className="auth-switch">
           {isLogin ? "New here? " : "Already have an account? "}

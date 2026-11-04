@@ -1,13 +1,30 @@
 import { createContext, useContext, useState } from "react";
-import { getUserById } from "../data/userInformation.js";
+import { getUserById, getUserByEmail, addUser } from "../data/userInformation.js";
 
 const AuthContext = createContext(null);
 const KEY = "gat-user-id";
+const PROFILE_KEY = "gat-user-profile";
+
+function readSaved(key) {
+  try {
+    return JSON.parse(localStorage.getItem(key) ?? sessionStorage.getItem(key) ?? "null");
+  } catch {
+    return null;
+  }
+}
 
 // Read the saved user id (from localStorage if "Remember me" was ticked, otherwise sessionStorage)
 function loadSavedId() {
+  const id = readSaved(KEY);
+  if (id == null) return null;
+  if (getUserById(id)) return id;
+
+  const profile = readSaved(PROFILE_KEY);
+  if (!profile?.email) return null;
+  const existing = getUserByEmail(profile.email);
+  if (existing) return existing.id;
   try {
-    return JSON.parse(localStorage.getItem(KEY) ?? sessionStorage.getItem(KEY) ?? "null");
+    return addUser({ name: profile.name || profile.email, email: profile.email, password: crypto.randomUUID() }).id;
   } catch {
     return null;
   }
@@ -23,9 +40,13 @@ export function AuthProvider({ children }) {
   // Call after a successful login. `remember` keeps you logged in after the browser closes.
   function login(newUser, remember = true) {
     try {
-      localStorage.removeItem(KEY);
-      sessionStorage.removeItem(KEY);
-      (remember ? localStorage : sessionStorage).setItem(KEY, JSON.stringify(newUser.id));
+      for (const k of [KEY, PROFILE_KEY]) {
+        localStorage.removeItem(k);
+        sessionStorage.removeItem(k);
+      }
+      const store = remember ? localStorage : sessionStorage;
+      store.setItem(KEY, JSON.stringify(newUser.id));
+      store.setItem(PROFILE_KEY, JSON.stringify({ name: newUser.name, email: newUser.email }));
     } catch {
       // storage blocked: the login still works until the page is refreshed
     }
@@ -34,8 +55,10 @@ export function AuthProvider({ children }) {
 
   function logout() {
     try {
-      localStorage.removeItem(KEY);
-      sessionStorage.removeItem(KEY);
+      for (const k of [KEY, PROFILE_KEY]) {
+        localStorage.removeItem(k);
+        sessionStorage.removeItem(k);
+      }
     } catch {
       // ignore
     }
