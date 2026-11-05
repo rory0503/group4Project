@@ -37,7 +37,7 @@ async def view(db: Session = Depends(database.getDatabase)):
     providers = services.collect_data()
 
     for provider in providers:
-        database.saveProvider(db, provider)
+        database.saveAllProvidersAndModels(db, provider)
     
     providers = database.readProviderList(db)
 

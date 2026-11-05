@@ -1,7 +1,6 @@
 import requests
 from app.models.model import Model
 from app.models.provider import Provider
-from app.database import saveProvider
 
 BASE_URL = "https://api.ecologits.ai/v1beta"
 
