@@ -2,8 +2,8 @@ from fastapi import APIRouter
 from .. import database
 from .. import services
 from pydantic import BaseModel
-from fastapi import Depends
-from sqlalchemy.orm import Session, Query
+from fastapi import Depends, Query
+from sqlalchemy.orm import Session
 
 
 
@@ -29,14 +29,13 @@ class ModelSchema(BaseModel):
     class Config:
         from_attributes = True
 
-
 #list a single model, e.g. /api/v1/models/5
-@router.get("/{modelID}", tags=["Models"], response_model=ModelSchema)
+@router.get("/{modelID : int}", tags=["Models"], response_model=ModelSchema)
 def getModel(modelID: int, db: Session = Depends(database.getDatabase)):
     model = database.readModel(db, modelID)
     return model
 
-@router.get("/{modelName}/models", tags=["model"], response_model=list[ModelSchema])
-async def searchModel(modelName: str = Query(min_length=2),  db: Session = Depends(database.getDatabase)):
-    models = database.searchModel(db, modelName)
+@router.get("/search", tags=["model"], response_model=list[ModelSchema])
+def searchModel(Name: str = Query(min_length=2),  db: Session = Depends(database.getDatabase)):
+    models = database.searchModel(db, Name)
     return models
