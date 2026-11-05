@@ -3,7 +3,8 @@ from .. import database
 from .. import services
 from pydantic import BaseModel
 from fastapi import Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, Query
+
 
 
 router = APIRouter()
@@ -34,3 +35,8 @@ class ModelSchema(BaseModel):
 def getModel(modelID: int, db: Session = Depends(database.getDatabase)):
     model = database.readModel(db, modelID)
     return model
+
+@router.get("/{modelName}/models", tags=["model"], response_model=list[ModelSchema])
+async def searchModel(modelName: str = Query(min_length=2),  db: Session = Depends(database.getDatabase)):
+    models = database.searchModel(db, modelName)
+    return models

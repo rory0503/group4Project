@@ -37,7 +37,7 @@ def saveAllProvidersAndModels(db: Session, provider: Provider):
         print(type(error))
         print(str(error))
 
-def readProviderList(db: Session):
+async def readProviderList(db: Session):
     providers = db.query(Provider).all()
     return providers
 
@@ -56,3 +56,6 @@ def readModelsByProvider(db: Session, providerID: int):
 #returns one model, or None if the id doesn't exist
 def readModel(db: Session, modelID: int):
     return db.get(Model, modelID)
+
+def searchModel(db: Session, modelName: str):
+    return db.query(Model).filter(Model.Name.contains(modelName)).order_by(Model.Name).all()
