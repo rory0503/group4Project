@@ -12,7 +12,7 @@ def getDatabase():
         db.close()
 
 #this function lets us create and store a model in the database, all in one go
-def saveProvider(db: Session, provider: Provider):
+def saveAllProvidersAndModels(db: Session, provider: Provider):
     db = SessionLocal()
 
     try:
@@ -41,4 +41,14 @@ def readProviderList(db: Session):
     providers = db.query(Provider).all()
     return providers
 
-#TODO: more functions to automate creating, storing and reading models
+#returns one provider, or None if the id doesn't exist
+def readProvider(db: Session, providerID: int):
+    return db.get(Provider, providerID)
+
+#returns every model that belongs to one provider
+def readModelsByProvider(db: Session, providerID: int):
+    return db.query(Model).filter(Model.Provider_ID == providerID).all()
+
+#returns one model, or None if the id doesn't exist
+def readModel(db: Session, modelID: int):
+    return db.get(Model, modelID)
