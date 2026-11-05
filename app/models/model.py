@@ -7,7 +7,7 @@ class Model(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     Name = Column(String(100), nullable=False)
-    Power_Consumption = Column(Integer)
+    Power_Consumption = Column(Float, nullable=False)
     Co2 = Column(Float, nullable=False)
     Water_Usage = Column(Float, nullable=False)
 

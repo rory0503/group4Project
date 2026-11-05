@@ -45,6 +45,10 @@ def readProviderList(db: Session):
 def readProvider(db: Session, providerID: int):
     return db.get(Provider, providerID)
 
+#returns one provider by its name (e.g. "openai"), or None if there isn't one
+def readProviderByName(db: Session, name: str):
+    return db.query(Provider).filter(Provider.Name == name).first()
+
 #returns every model that belongs to one provider
 def readModelsByProvider(db: Session, providerID: int):
     return db.query(Model).filter(Model.Provider_ID == providerID).all()
