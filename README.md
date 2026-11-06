@@ -4,7 +4,7 @@
 
 `api-integration` is only for checking that the backend and front end work together.
 
-Keep doing your normal work on the usual branches:
+Keep doing your normal work on the other branches:
 - Backend work → `Backend`
 - Front-end work → `FrontEnd`
 
