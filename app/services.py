@@ -54,12 +54,12 @@ def get_model_data(provider, model, output_token_count=300, electricity_mix_zone
     response.raise_for_status()
 
     impacts = response.json()["impacts"]
-
+    
     return Model(
         Name=model,
-        Power_Consumption=_midpoint(impacts, "energy"),
-        Co2=_midpoint(impacts, "gwp"),
-        Water_Usage=_midpoint(impacts, "wcf"),
+        Power_Consumption = round(_midpoint(impacts, "energy"), 5),
+        Co2 = round(_midpoint(impacts, "gwp"), 5),
+        Water_Usage = round(_midpoint(impacts, "wcf"), 5),
     )
 
 def get_provider_data(providerName):
