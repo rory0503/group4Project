@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useAuth } from "../../context/AuthContext";
 
 const METRICS = ["Water (Litres)", "Energy (kWh)", "CO2 (kg)"];
 const TIME_RANGES = ["Last 30 Days", "Last Year", "Last 5 Years", "All Time"];
@@ -89,7 +90,7 @@ function Settings({ user }) {
     const [timeRange, setTimeRange] = useState(saved.timeRange ?? "Last 5 Years");
     const [language, setLanguage] = useState(saved.language ?? "English (EN)");
     const [theme, setTheme] = useState(saved.theme ?? "Light");
-    const [rememberMe, setRememberMe] = useState(saved.rememberMe ?? true);
+    const { remember: rememberMe, setRemember } = useAuth();
 
     return (
         <section className="settings">
@@ -147,7 +148,7 @@ function Settings({ user }) {
                     aria-checked={rememberMe}
                     aria-label="Remember me"
                     className={`settings-toggle ${rememberMe ? "settings-toggle--on" : ""}`}
-                    onClick={() => setRememberMe((on) => !on)}
+                    onClick={() => setRemember(!rememberMe)}
                 >
                     <span className="settings-toggle__knob" />
                 </button>

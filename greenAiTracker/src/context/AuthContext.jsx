@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from "react";
-import { getUserById, getUserByEmail, addUser } from "../data/userInformation.js";
+import { getUserById, getUserByEmail } from "../data/userInformation.js";
 
 const AuthContext = createContext(null);
 const KEY = "gat-user-id";
@@ -13,6 +13,15 @@ function readSaved(key) {
   }
 }
 
+// true if the saved login lives in localStorage (i.e. "Remember me" button was on)
+function isRemembered() {
+  try {
+    return localStorage.getItem(KEY) !== null;
+  } catch {
+    return false;
+  }
+}
+
 // Read the saved user id (from localStorage if "Remember me" was ticked, otherwise sessionStorage)
 function loadSavedId() {
   const id = readSaved(KEY);
@@ -22,35 +31,43 @@ function loadSavedId() {
   const profile = readSaved(PROFILE_KEY);
   if (!profile?.email) return null;
   const existing = getUserByEmail(profile.email);
-  if (existing) return existing.id;
-  try {
-    return addUser({ name: profile.name || profile.email, email: profile.email, password: crypto.randomUUID() }).id;
-  } catch {
-    return null;
-  }
+  return existing ? existing.id : null; // never invent a new account
 }
 
 // Wrap the whole app in this so every page can know who is logged in
 export function AuthProvider({ children }) {
   const [userId, setUserId] = useState(loadSavedId);
+  const [remember, setRememberState] = useState(isRemembered);
 
   // The full user object (undefined if nobody is logged in)
   const user = userId ? getUserById(userId) : undefined;
 
   // Call after a successful login. `remember` keeps you logged in after the browser closes.
-  function login(newUser, remember = true) {
+    // Writes the login into localStorage (keep = true) or sessionStorage (keep = false)
+  function persist(u, keep) {
     try {
       for (const k of [KEY, PROFILE_KEY]) {
         localStorage.removeItem(k);
         sessionStorage.removeItem(k);
       }
-      const store = remember ? localStorage : sessionStorage;
-      store.setItem(KEY, JSON.stringify(newUser.id));
-      store.setItem(PROFILE_KEY, JSON.stringify({ name: newUser.name, email: newUser.email }));
+      const store = keep ? localStorage : sessionStorage;
+      store.setItem(KEY, JSON.stringify(u.id));
+      store.setItem(PROFILE_KEY, JSON.stringify({ name: u.name, email: u.email }));
     } catch {
-      // storage blocked: the login still works until the page is refreshed
+      // storage blocked: login still works until refresh
     }
+  }
+
+  function login(newUser, keep = true) {
+    persist(newUser, keep);
+    setRememberState(keep);
     setUserId(newUser.id);
+  }
+  
+  // Used by the Remember Me toggle on the Profile page
+  function setRemember(keep) {
+    if (user) persist(user, keep);
+    setRememberState(keep);
   }
 
   function logout() {
@@ -66,7 +83,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, isLoggedIn: Boolean(user), login, logout }}>
+    <AuthContext.Provider value={{ user, isLoggedIn: Boolean(user), remember, setRemember, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

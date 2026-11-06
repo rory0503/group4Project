@@ -51,7 +51,33 @@ export const users = [
         favouriteModelIds: ["claude-fable-5"],
     }),
 ];
+const USERS_KEY = "gat-users";
 
+function saveUsers() {
+    try {
+        const plain = users.map(({ id, name, email, password, favouriteModelIds }) => ({ id, name, email, password, favouriteModelIds }));
+        localStorage.setItem(USERS_KEY, JSON.stringify(plain));
+    } catch {
+        // storage blocked: changes last until refresh
+    }
+}
+
+function loadUsers() {
+    try {
+        const saved = JSON.parse(localStorage.getItem(USERS_KEY) ?? "[]");
+        for (const u of saved) {
+            const existing = users.find((x) => x.id === u.id || x.email.toLowerCase() === u.email.toLowerCase());
+            if (existing) {
+                existing.favouriteModelIds = u.favouriteModelIds ?? existing.favouriteModelIds;
+            } else {
+                users.push(createUser(u));
+            }
+        }
+    } catch (e) {
+        console.error("loadUsers failed:", e);
+    }
+}
+loadUsers();
 // Keeps your old imports working: anything using currentUser still gets the first user
 export const currentUser = users[0];
 
@@ -89,6 +115,7 @@ export function addUser({ name, email, password, favouriteModelIds = [] }) {
 
     const newUser = createUser({ id, name, email, password, favouriteModelIds: [...favouriteModelIds] });
     users.push(newUser);
+    saveUsers();
     return newUser;
 }
 
@@ -98,6 +125,7 @@ export function addFavourite(userId, modelId) {
     if (!user) throw new Error("User not found.");
     if (!models.some((m) => m.id === modelId)) throw new Error("Unknown model id.");
     if (!user.favouriteModelIds.includes(modelId)) user.favouriteModelIds.push(modelId);
+    saveUsers();
     return user;
 }
 
@@ -106,6 +134,7 @@ export function removeFavourite(userId, modelId) {
     const user = getUserById(userId);
     if (!user) throw new Error("User not found.");
     user.favouriteModelIds = user.favouriteModelIds.filter((id) => id !== modelId);
+    saveUsers();
     return user;
 }
 
