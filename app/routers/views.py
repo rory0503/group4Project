@@ -13,6 +13,16 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 from app.utils import compareProvidersAndModels
 
+def updateModelsAndProviders(db: Session):
+    newProviders = services.collect_data()
+    savedProviders = database.readProviderList(db)
+
+    if compareProvidersAndModels(newProviders, savedProviders) == False:
+        print("deleting")
+        database.deleteAllProvidersAndModels(db)
+        print("writing")
+        database.saveAllProvidersAndModels(db, newProviders)
+
 @router.get("/", tags=["Views"])
 async def view(db: Session = Depends(database.getDatabase)):
     
@@ -20,11 +30,4 @@ async def view(db: Session = Depends(database.getDatabase)):
 
     if (currentTime - lastUpdate) > refreshDelay:
 
-        newProviders = services.collect_data()
-        savedProviders = database.readProviderList(db)
-
-        if compareProvidersAndModels(newProviders, savedProviders) == False:
-            print("deleting")
-            database.deleteAllProvidersAndModels(db)
-            print("writing")
-            database.saveAllProvidersAndModels(db, newProviders)
+        updateModelsAndProviders(db)

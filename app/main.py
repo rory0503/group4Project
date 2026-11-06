@@ -2,6 +2,9 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.databaseConfig import Base, engine
+from contextlib import contextmanager
+from app.database import getDatabase
+from app.routers.views import updateModelsAndProviders
 
 from app.routers import api_router
 
@@ -38,3 +41,12 @@ async def root():
         "project": PROJECT_NAME,
         "docs_url": "/docs"
     }
+
+#on server startup, update data immedietelly
+with contextmanager(getDatabase)() as db:
+    try:
+        updateModelsAndProviders(db)
+        print("Database sync complete.", flush=True)
+    except Exception as e:
+        print(f"Error during sync: {e}", flush=True)
+        db.rollback()
