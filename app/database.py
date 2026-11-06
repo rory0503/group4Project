@@ -2,6 +2,7 @@ from app.databaseConfig import SessionLocal
 from sqlalchemy.orm import Session
 from app.models.model import Model
 from app.models.provider import Provider
+from sqlalchemy import text
 
 #create a database session that closes after use
 def getDatabase():
@@ -12,30 +13,22 @@ def getDatabase():
         db.close()
 
 #this function lets us create and store a model in the database, all in one go
-def saveAllProvidersAndModels(db: Session, provider: Provider):
-    db = SessionLocal()
-
+def saveAllProvidersAndModels(db: Session, providers: list[Provider]):
     try:
-        db.add(provider)
-
-        print("Before commit:")
-        print("Provider:", provider.Name)
-        print("Provider ID:", provider.id)
-        print("Amount of models:", len(provider.Models))
-
-        for model in provider.Models:
-            print("Model:", model.Name)
-            print("Model Provider ID:", model.Provider_ID)
+        db.add_all(providers)
 
         db.commit()
-        db.refresh(provider)
 
-        return provider
+        for provider in providers:
+            db.refresh(provider)
+
+        return providers
 
     except Exception as error:
         db.rollback()
         print(type(error))
         print(str(error))
+        raise
 
 def readProviderList(db: Session):
     providers = db.query(Provider).all()
@@ -59,3 +52,22 @@ def readModel(db: Session, modelID: int):
 
 def searchModel(db: Session, name: str):
     return db.query(Model).filter(Model.Name.contains(name, autoescape=True)).order_by(Model.Name).all()
+
+def deleteAllProvidersAndModels(db: Session):
+    try:
+        db.query(Model).delete(synchronize_session=False)
+        db.query(Provider).delete(synchronize_session=False)
+
+        # Reset auto-increment counters
+        db.execute(text("ALTER TABLE model AUTO_INCREMENT = 1"))
+        db.execute(text("ALTER TABLE providers AUTO_INCREMENT = 1"))
+
+        db.commit()
+
+        print("All providers and models have been deleted and ID counters reset.")
+
+    except Exception as error:
+        db.rollback()
+        print("Error deleting providers and models:")
+        print(str(error))
+        raise
