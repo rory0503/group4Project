@@ -1,22 +1,19 @@
 import { years, currentYear } from "../data/models";
 
-// The three things the site measures.
+// The three things the site measures, per request.
 export const METRICS = {
-  water: { key: "water", label: "Water", long: "Litres (L)", unit: "L", icon: "droplet", color: "--water", axis: "million L", scale: 1e6, title: "Water usage" },
-  energy: { key: "energy", label: "Energy", long: "Gigawatt-hours (GWh)", unit: "GWh", icon: "zap", color: "--energy", axis: "GWh", scale: 1, title: "Energy usage" },
-  co2: { key: "co2", label: "CO₂", long: "Metric tonnes (t)", unit: "t", icon: "cloud", color: "--co2", axis: "thousand t", scale: 1e3, title: "CO₂ emissions" },
+  water: { key: "water", label: "Water", long: "Millilitres per request (mL)", unit: "mL", icon: "droplet", color: "--water", axis: "mL per request", scale: 1, title: "Water usage" },
+  energy: { key: "energy", label: "Energy", long: "Watt-hours per request (Wh)", unit: "Wh", icon: "zap", color: "--energy", axis: "Wh per request", scale: 1, title: "Energy usage" },
+  co2: { key: "co2", label: "CO₂", long: "Grams per request (g)", unit: "g", icon: "cloud", color: "--co2", axis: "g per request", scale: 1, title: "CO₂ emissions" },
 };
 
-// Number formatting
-export const fmtInt = (n) => Math.round(n).toLocaleString("en-GB");
-export const fmt1 = (n) =>
-  (Math.round(n * 10) / 10).toLocaleString("en-GB", { maximumFractionDigits: 1 });
+// Number formatting. Keeps 3 significant figures so small values like 0.0042 don't show as 0
+export const fmtInt = (n) => n.toLocaleString("en-GB", { maximumSignificantDigits: 3 });
+export const fmt1 = fmtInt;
 
-// Short value plus unit, e.g. { value: "68.4", unit: "M L" }
+// Value plus unit, e.g. { value: "4.2", unit: "Wh" }
 export function compact(metric, v) {
-  if (metric === "water") return { value: fmt1(v / 1e6), unit: "M L" };
-  if (metric === "co2") return { value: fmt1(v / 1e3), unit: "k t" };
-  return { value: fmtInt(v), unit: "GWh" };
+  return { value: fmtInt(v), unit: METRICS[metric].unit };
 }
 
 // Finding models

@@ -51,9 +51,9 @@ function toFrontEndModel(m, company) {
     name: m.Name,
     company,
     release: null,
-    energy: m.Power_Consumption,
-    water: m.Water_Usage,
-    co2: m.Co2,
+    energy: m.Power_Consumption*1000, // convert kWh to Wh
+    water: m.Water_Usage*1000, // convert m3 to L
+    co2: m.Co2*1000, // convert kg to g
     growth: 1,
     proj: 1,
   };
