@@ -15,8 +15,9 @@ The React Compiler is not enabled on this template because of its impact on dev 
 ## How to run (in terminal)
 
 cd greenAiTracker
+(possible install npm)
 npm run dev
--- then copy link into a search bar and then it should load.
+-- then copy link into a search bar and then it should load or open in visual studio.
 
 ## Actual Data
 Once we have the layout done for the website we need to get the real data stuck in and replace the sample data. Hopefully have the real data in for 3/11/26

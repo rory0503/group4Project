@@ -45,7 +45,7 @@ export default function CompareTable({ models, total }) {
             {/*One table row per entry is ROWS */}
           {ROWS.map((row) => {
             // Each models value for this row, and which value is the best
-            const values = models.map((m) => m[row.key]);
+            const values = models.map((m) => m[row.key]);                                                                     
             const target = row.best === "min" ? Math.min(...values) : row.best === "max" ? Math.max(...values) : null;
             // only highlight when exactly one model has the best value
             const hasWinner = models.length > 1 && row.best && values.filter((v) => v === target).length === 1;
