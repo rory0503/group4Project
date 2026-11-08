@@ -14,7 +14,13 @@ The React Compiler is not enabled on this template because of its impact on dev 
 
 ## How to run (in terminal)
 
+## on each run
 cd greenAiTracker
+npm run dev
+
+## if this does not load the site do this
+npm install @react-oauth/google
+## then run
 npm run dev
 -- then copy link into a search bar and then it should load.
 
