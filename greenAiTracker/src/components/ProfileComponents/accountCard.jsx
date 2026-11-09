@@ -2,21 +2,12 @@ import { useNavigate } from "react-router-dom";
 import { LogOut } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
-// Turns a date like "2026-03-14" into "14 March 2026" (returns nothing if there isn't one)
-function formatDate(value) {
-  if (!value) return null;
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return null;
-  return date.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
-}
-
 function AccountCard({ user }) {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
   // Show the name if the user has one, otherwise the part of the email before the @
   const displayName = user.name || user.email.split("@")[0];
-  const joined = formatDate(user.joined ?? user.createdAt);
 
   function handleLogout() {
     logout();
@@ -27,7 +18,6 @@ function AccountCard({ user }) {
   const details = [
     { label: "Email", value: user.email },
     { label: "Password", value: "••••••••" },
-    joined && { label: "Member since", value: joined },
   ].filter(Boolean);
 
   return (
