@@ -165,13 +165,35 @@ export const scoreBands = [
   { range: "0 – 17", label: "High impact" },
 ];
 
+
 export const sources = [
-  { title: "Power Hungry Processing: Watts Driving the Cost of AI Deployment?", url: "https://arxiv.org/abs/2311.16863", meta: "Luccioni, Jernite & Strubell · ACM FAccT, 2024" },
-  { title: 'Making AI Less "Thirsty": Uncovering and Addressing the Secret Water Footprint of AI Models', url: "https://arxiv.org/abs/2304.03271", meta: "Li, Yang, Islam & Ren · 2023" },
-  { title: "Carbon Emissions and Large Neural Network Training", url: "https://arxiv.org/abs/2104.10350", meta: "Patterson et al. · 2021" },
-  { title: "Energy and Policy Considerations for Deep Learning in NLP", url: "https://arxiv.org/abs/1906.02243", meta: "Strubell, Ganesh & McCallum · ACL, 2019" },
-  { title: "Energy and AI", url: "https://www.iea.org/reports/energy-and-ai", meta: "International Energy Agency · 2025" },
+  {
+    title: "United Nations Environment Programme (2024) – Artificial Intelligence (AI) End-to-End: The Environmental Impact of the Full AI Lifecycle",
+    meta: "United Nations Environment Programme, 2024. Covers energy, water, minerals, emissions and electronic waste across the AI lifecycle.",
+    url: "https://wedocs.unep.org/handle/20.500.11822/46288"
+  },
+  {
+    title: "International Energy Agency (2025) – Energy and AI",
+    meta: "International Energy Agency, 2025. Examines data-centre electricity demand, energy supply and emissions.",
+    url: "https://www.iea.org/reports/energy-and-ai"
+  },
+  {
+    title: "OECD (2022) – Measuring the Environmental Impacts of Artificial Intelligence Compute and Applications: The AI Footprint",
+    meta: "OECD Digital Economy Papers, No. 341, 2022. Explains the direct and indirect environmental impacts of AI and the challenges of measuring them.",
+    url: "https://www.oecd.org/en/publications/measuring-the-environmental-impacts-of-artificial-intelligence-compute-and-applications_7babf571-en.html"
+  },
+  {
+    title: "Li, P., Yang, J., Islam, M. A. and Ren, S. (2023) – Making AI Less 'Thirsty': Uncovering and Addressing the Secret Water Footprint of AI Models",
+    meta: "Research paper, 2023. Examines AI's water footprint, including water used in data-centre operations and model training.",
+    url: "https://arxiv.org/abs/2304.03271"
+  },
+  {
+    title: "International Telecommunication Union (2025) – Measuring What Matters: How to Assess AI's Environmental Impact",
+    meta: "ITU, 2025. Reviews current environmental measurement methods and highlights gaps, indirect estimates and the need for greater transparency.",
+    url: "https://www.itu.int/hub/publication/s-gen-gda-001-2025/"
+  }
 ];
+
 
 export const contact = [
   { icon: Mail, label: "Email", value: "contact@email.com", href: "mailto:contact@email.com" },
