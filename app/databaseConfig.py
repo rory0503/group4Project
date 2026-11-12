@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
 DB_USER = "root"
-DB_PASSWORD = "your_password"
+DB_PASSWORD = "password"
 DB_HOST = "localhost"
 DB_PORT = "3306"
 DB_NAME = "green_ai"
