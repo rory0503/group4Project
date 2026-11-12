@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Info, Download, ArrowRight, X } from "lucide-react";
+import { Download, ArrowRight, X } from "lucide-react";
 import useLocalStorage from "../hooks/useLocalStorage";
 import useModels from "../hooks/useModels";
 import { tips } from "../data/models";
@@ -11,6 +11,8 @@ import TipsElement from "../components/DashboardComponents/TipsElement";
 import MetricPicker from "../components/MetricPicker";
 import ModelPicker from "../components/ModelPicker";
 import ModelTable from "../components/ModelTable";
+import TrendChart from "../components/TrendChart";
+import useFavourites, { favouritesFirst } from "../hooks/useFavourites";
 import "../styles/dashboard.css";
 
 export default function Dashboard() {
@@ -19,10 +21,12 @@ export default function Dashboard() {
   // the defaults saved on the Profile page (default metric and time range)
   const [profileSettings] = useLocalStorage("profile-settings", {});
   const [secondId, setSecondId] = useState(null);
-  const [metric, setMetric] = useState(profileSettings.metric ?? "water"); //  starts on the saved default
+  const [metric, setMetric] = useState(profileSettings.metric ?? "water");
   const [mode, setMode] = useState("year");
-  const [range, setRange] = useState(profileSettings.range ?? "all"); //  starts on the saved default
+  const [range, setRange] = useState(profileSettings.range ?? "all");
   const [sort, setSort] = useState({ key: "score", dir: "desc" });
+  const [favourites] = useFavourites();
+  const pickerModels = favouritesFirst(models, favourites);
 
   // find model by id or default to first model
   const model = byId(models, primaryId) ?? models[0];
@@ -43,6 +47,11 @@ export default function Dashboard() {
   if (secondId) ids.add(secondId);
   const tableModels = sortModels(models.filter((m) => ids.has(m.id)), sort.key, sort.dir);
 
+  // The lines on the chart: the chosen model, plus the second model if there is one.
+  // (slot 0 and 1 pick the line colours.)
+  const second = secondId ? byId(models, secondId) : null;
+  const chartItems = [{ model, slot: 0 }, ...(second ? [{ model: second, slot: 1 }] : [])];
+
   //message at top of page containing chosen models name.
   return (
     <main id="main" className="page">
@@ -54,14 +63,13 @@ export default function Dashboard() {
               <p>The yearly resource footprint of <strong>{model.name}</strong>, and how it compares.</p>
             )}
           </div>
-          <span className="badge"><Info className="icon icon-sm" />Illustrative sample data</span>
         </div>
-        
+
         {/* There for when the backend is connected, showing if the data is loading, if there is an error or if there are no models available. */}
         {loading && <p className="card">Loading model data…</p>}
         {error && <div className="notice">We couldn't load the model data. Try again in a moment.</div>}
         {!loading && !error && !model && <p className="card">No models are available yet.</p>}
-        
+
         {/* If a model is selected, show the dashboard content. */}
         {model && (
           <>
@@ -77,7 +85,7 @@ export default function Dashboard() {
                 <div className="field">
                   <span className="label">Model</span>
                   <ModelPicker
-                    models={models}
+                    models={pickerModels}
                     value={model.id}
                     onChange={setPrimaryId}
                     label="Model"
@@ -90,7 +98,7 @@ export default function Dashboard() {
                   <div style={{ display: "flex", gap: 8 }}>
                     <div style={{ flex: 1 }}>
                       <ModelPicker
-                        models={models}
+                        models={pickerModels}
                         value={secondId}
                         onChange={setSecondId}
                         label="Compare with"
@@ -110,7 +118,7 @@ export default function Dashboard() {
                     )}
                   </div>
                 </div>
-                {/* change view of the chart to be per year or cumulative. - if possible with backend data */}
+                {/* change view of the chart to be per year or cumulative. */}
                 <div className="field">
                   <label className="label" htmlFor="mode">View</label>
                   <select className="select" id="mode" value={mode} onChange={(e) => setMode(e.target.value)}>
@@ -133,11 +141,9 @@ export default function Dashboard() {
                 <div className="card chart-card">
                   <div className="chart-head">
                     <h2 id="trend-title">{meta.title} over time</h2>
-                    <span className="chart-unit">{meta.title} ({meta.axis})</span>
                   </div>
-                  <div className="chart-box">
-                    <p className="card-sub">The chart will go here.</p>
-                  </div>
+                  {/* the line chart, with its own key (legend) and axis labels */}
+                  <TrendChart items={chartItems} metric={metric} mode={mode} range={range} />
                 </div>
 
                 <div className="card">

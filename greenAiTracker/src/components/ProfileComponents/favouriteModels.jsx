@@ -4,6 +4,7 @@ import { ArrowLeftRight, LayoutDashboard, Plus, Search, Star, Undo2, X } from "l
 import useModels from "../../hooks/useModels";
 import useLocalStorage from "../../hooks/useLocalStorage";
 import { companyColors } from "../../data/models";
+import useFavourites from "../../hooks/useFavourites";
 
 // The most search results shown at once
 const MAX_RESULTS = 6;
@@ -15,10 +16,7 @@ function FavouriteModel({ user }) {
   // The Dashboard opens on whichever model is saved under "selected"
   const [, setSelected] = useLocalStorage("selected", "");
 
-  // The user's favourites. Saved in this browser per user until the backend is connected;
-  // the first time, it starts from the favourites the user already has.
-  const [stored, setStored] = useLocalStorage(`favourites-${user?.id ?? "guest"}`, null);
-  const favourites = stored ?? (user?.favouriteModels ?? []).filter((m) => m.isFavourite !== false);
+  const [favourites, setFavourites] = useFavourites();
 
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0); // which search result the arrow keys are on
@@ -38,7 +36,7 @@ function FavouriteModel({ user }) {
 
   // Adds a model from the results and clears the search
   function addFavourite(model) {
-    setStored([...favourites, { id: model.id, name: model.name, company: model.company }]);
+    setFavourites([...favourites, { id: model.id, name: model.name, company: model.company }]);
     setQuery("");
     setActive(0);
   }
@@ -46,7 +44,7 @@ function FavouriteModel({ user }) {
   // Removes a model and offers Undo for 6 seconds
   function removeFavourite(model) {
     const index = favourites.findIndex((m) => m.id === model.id);
-    setStored(favourites.filter((m) => m.id !== model.id));
+    setFavourites(favourites.filter((m) => m.id !== model.id));
     setRemoved({ model, index });
     clearTimeout(undoTimer.current);
     undoTimer.current = setTimeout(() => setRemoved(null), 6000);
@@ -57,7 +55,7 @@ function FavouriteModel({ user }) {
     if (!removed) return;
     const next = [...favourites];
     next.splice(removed.index, 0, removed.model);
-    setStored(next);
+    setFavourites(next);
     setRemoved(null);
     clearTimeout(undoTimer.current);
   }

@@ -350,7 +350,7 @@ button { cursor: pointer; }
 @media (max-width: 560px) { .toolbar { grid-template-columns: 1fr; } }
  
 /* ---------- Chart ---------- */
-.chart-layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 16px; }
+.chart-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; }
 @media (max-width: 900px) { .chart-layout { grid-template-columns: 1fr; } }
 .chart-card { padding: 20px 20px 16px; }
 .chart-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
@@ -372,6 +372,7 @@ button { cursor: pointer; }
   display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px;
   border: 1px solid var(--border); background: var(--surface);
   transition: border-color 0.15s, background-color 0.15s;
+  min-height: 64px;
 }
 .metric-option .opt:hover { border-color: var(--border-strong); }
 .metric-option .opt-icon { color: var(--c); }
