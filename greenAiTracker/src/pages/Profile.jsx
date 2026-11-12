@@ -1,5 +1,6 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import AccountCard from "../components/ProfileComponents/accountCard";
 import FavouriteModel from "../components/ProfileComponents/favouriteModels";
 import Settings from "../components/ProfileComponents/profileSettings";
 import "../styles/profile.css";
@@ -22,8 +23,11 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* The two cards, side by side */}
         <div className="profile-page">
+          {/* Who is logged in, their details and the log out button */}
+          <AccountCard user={user} />
+
+          {/* The two cards, side by side */}
           <div className="profile-content">
             <FavouriteModel user={user} />
             <Settings user={user} />

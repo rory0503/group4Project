@@ -16,10 +16,12 @@ import "../styles/dashboard.css";
 export default function Dashboard() {
   const { models, loading, error } = useModels();
   const [primaryId, setPrimaryId] = useLocalStorage("selected", "");
+  // the defaults saved on the Profile page (default metric and time range)
+  const [profileSettings] = useLocalStorage("profile-settings", {});
   const [secondId, setSecondId] = useState(null);
-  const [metric, setMetric] = useState("water");
+  const [metric, setMetric] = useState(profileSettings.metric ?? "water"); //  starts on the saved default
   const [mode, setMode] = useState("year");
-  const [range, setRange] = useState("all");
+  const [range, setRange] = useState(profileSettings.range ?? "all"); //  starts on the saved default
   const [sort, setSort] = useState({ key: "score", dir: "desc" });
 
   // find model by id or default to first model
@@ -41,7 +43,7 @@ export default function Dashboard() {
   if (secondId) ids.add(secondId);
   const tableModels = sortModels(models.filter((m) => ids.has(m.id)), sort.key, sort.dir);
 
-    //message at top of page containing chosen models name.
+  //message at top of page containing chosen models name.
   return (
     <main id="main" className="page">
       <div className="container">
@@ -54,12 +56,12 @@ export default function Dashboard() {
           </div>
           <span className="badge"><Info className="icon icon-sm" />Illustrative sample data</span>
         </div>
-
+        
         {/* There for when the backend is connected, showing if the data is loading, if there is an error or if there are no models available. */}
         {loading && <p className="card">Loading model data…</p>}
         {error && <div className="notice">We couldn't load the model data. Try again in a moment.</div>}
         {!loading && !error && !model && <p className="card">No models are available yet.</p>}
-
+        
         {/* If a model is selected, show the dashboard content. */}
         {model && (
           <>

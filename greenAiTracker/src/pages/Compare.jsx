@@ -11,27 +11,29 @@ import InsightCards from "../components/CompareComponents/InsightCards";
 import CompareTable from "../components/CompareComponents/CompareTable";
 import "../styles/compare.css";
 
-// max models that can be compared at once
+// The most models that can be compared at once
 const MAX_MODELS = 3;
 
 export default function Compare() {
-  // All models, plus loading/error states (for when the backend is connected).
+  // All models, plus loading/error states (for when the backend is connected)
   const { models, loading, error } = useModels();
   const [searchParams] = useSearchParams();
-  // Model last viewed on the dashboard, used as starting choice.
+  // The model last viewed on the Dashboard (used as a starting choice)
   const [dashboardId] = useLocalStorage("selected", "");
+  // the defaults saved on the Profile page (default metric and time range)
+  const [profileSettings] = useLocalStorage("profile-settings", {});
 
   // The chosen models IDs (1–3). Starts from a shared link (?models=a,b,c) if there is one.
   const [ids, setIds] = useState(() =>
     (searchParams.get("models") || "").split(",").filter(Boolean).slice(0, MAX_MODELS)
   );
-  //Chart settings (chart itself itsnt built yet)
-  const [metric, setMetric] = useState("water");
+  // Chart settings (the chart itself isn't built yet). They start on the defaults saved on the Profile page.
+  const [metric, setMetric] = useState(profileSettings.metric ?? "water"); // 
   const [mode, setMode] = useState("year");
-  const [range, setRange] = useState("all");
+  const [range, setRange] = useState(profileSettings.range ?? "all"); // 
   const [linkStatus, setLinkStatus] = useState(null); // null | "copied" | "failed"
-   
-  //details of selected metric, used for chart title and axis label.
+
+  // Details of the selected metric (title, axis label)
   const meta = METRICS[metric];
 
   // Once the models have loaded: drop any unknown ids from the link, and if nothing is
@@ -55,7 +57,7 @@ export default function Compare() {
     window.history.replaceState(window.history.state, "", url);
   }, [ids]);
 
-  // turn the chosen IDS into model objects, filtering out any that are no longer available.
+  // Turn the chosen ids into full model objects
   const chosen = ids.map((id) => byId(models, id)).filter(Boolean);
 
   // Picking a model replaces that slot; clearing it (null) removes the slot
@@ -65,12 +67,12 @@ export default function Compare() {
     );
   }
 
-  // adds a model to the end of the list, up to the maximum.
+  // Adds a model to the end (up to the maximum)
   function addModel(newId) {
     if (newId) setIds((prev) => (prev.length < MAX_MODELS ? [...prev, newId] : prev));
   }
 
-  //copies the page link, then shows "link copied" for 2.5 seconds
+  // Copies the page link, then shows "Link copied" for 2.5 seconds
   async function copyLink() {
     try {
       await navigator.clipboard.writeText(window.location.href);
@@ -101,14 +103,14 @@ export default function Compare() {
             </span>
           </button>
         </div>
-        
+
         {/* Loading and error messages (for when the backend is connected) */}
         {loading && <p className="card">Loading model data…</p>}
         {error && <div className="notice">We couldn't load the model data. Try again in a moment.</div>}
 
         {!loading && !error && (
           <>
-           {/* The model cards: one per chosen model, plus an empty one to add another */}
+            {/* The model cards: one per chosen model, plus an empty one to add another */}
             <section className="slots" aria-label="Models being compared">
               {chosen.map((model, i) => (
                 <ModelSelectCard
@@ -135,6 +137,7 @@ export default function Compare() {
             {/* Everything below only shows once at least one model is chosen */}
             {chosen.length > 0 && (
               <>
+                {/* Chart section: dropdowns, chart placeholder and metric picker */}
                 <section className="section" aria-labelledby="trend-title">
                   <div className="toolbar" style={{ gridTemplateColumns: "repeat(2, minmax(0, 220px))" }}>
                     <div className="field">
@@ -160,6 +163,7 @@ export default function Compare() {
                         <h2 id="trend-title">{meta.title} over time</h2>
                         <span className="chart-unit">{meta.title} ({meta.axis})</span>
                       </div>
+                      {/* Coloured key for each model */}
                       <div className="legend">
                         {chosen.map((m, i) => (
                           <span className="legend-item" key={m.id}>
