@@ -8,7 +8,7 @@ const COLS = [
   { key: "water", label: "Water", unit: "Litres", right: true },
   { key: "co2", label: "CO₂", unit: "Metric tons", right: true },
   { key: "energy", label: "Energy", unit: "GWh", right: true },
-  { key: "score", label: "Score", unit: "out of 30", right: true },
+  { key: "score", label: "Score", unit: "out of 12", right: true },
 ];
 
 // One clickable column heading
@@ -89,11 +89,11 @@ export default function ModelTable({ models, selectedId, sort, onSort, showRank 
                 <td className="r">{fmtInt(m.co2)}</td>
                 <td className="r">{fmtInt(m.energy)}</td>
                 <td className="r">
-                  {/* Score text, e.g. 24/30 */}
-                  <span className="score">{m.score}<small>/30</small></span>
-                  {/* Score bar, width = score out of 30 */}
+                  {/* Score text, e.g. 9/12 */}
+                  <span className="score">{m.score}<small>/12</small></span>
+                  {/* Score bar, width = score out of 12 */}
                   <span className="score-bar" aria-hidden="true">
-                    <i style={{ width: `${(m.score / 30) * 100}%` }} />
+                    <i style={{ width: `${(m.score / 12) * 100}%` }} />
                   </span>
                 </td>
               </tr>

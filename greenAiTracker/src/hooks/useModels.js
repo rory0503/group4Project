@@ -59,16 +59,58 @@ function toFrontEndModel(m, company) {
   };
 }
 
-// PLACEHOLDER score out of 30 until the team agrees how to score models:
-// the lowest CO2 gets 30 and the highest gets 0. Rank 1 is the best score.
+// PLACEHOLDER scoring until the team agrees how to score models.
+// Each of water, energy and CO2 is scored by which quartile bin it falls in,
+// then the three scores are added together. Rank 1 is the best score.
+
+// Gets the value at a given point (0 to 1) of a sorted list, e.g. 0.25 for Q1
+function quantile(sorted, q) {
+  const pos = (sorted.length - 1) * q;
+  const lower = Math.floor(pos);
+  const upper = Math.ceil(pos);
+  return sorted[lower] + (sorted[upper] - sorted[lower]) * (pos - lower);
+}
+
+// Works out the three thresholds (Q1, median, Q3) for one measure
+function getThresholds(models, key) {
+  const sorted = models.map((m) => m[key]).sort((a, b) => a - b);
+  return [quantile(sorted, 0.25), quantile(sorted, 0.5), quantile(sorted, 0.75)];
+}
+
+// Lower values are better, so the lowest quartile scores highest
+function binScore(value, [q1, median, q3]) {
+  // Less than q1: exceptional
+  if (value <= q1) return 4;
+  // Between q1 and median: average
+  if (value <= median) return 3;
+  // Between median and q3: below average
+  if (value <= q3) return 2;
+  // More than q3: Very Poor
+  return 1;
+}
+
 function addScoreAndRank(models) {
-  const co2s = models.map((m) => m.co2);
-  const min = Math.min(...co2s);
-  const max = Math.max(...co2s);
-  const spread = max - min || 1;
+  // Gets threshold value for each expenditure
+  const waterThresholds = getThresholds(models, "water");
+  const energyThresholds = getThresholds(models, "energy");
+  const co2Thresholds = getThresholds(models, "co2");
 
   return models
-    .map((m) => ({ ...m, score: Math.round(30 * (1 - (m.co2 - min) / spread)) }))
+    .map((m) => {
+      // Gets bin scores for each expindture using threshold
+      const waterScore = binScore(m.water, waterThresholds);
+      const energyScore = binScore(m.energy, energyThresholds);
+      const co2Score = binScore(m.co2, co2Thresholds);
+      return {
+        ...m,
+        waterScore,
+        energyScore,
+        co2Score,
+        // Adds expindture values togther, creating total score
+        score: waterScore + energyScore + co2Score,
+      };
+    })
+    // Highest score first, with lower energy breaking ties
     .sort((a, b) => b.score - a.score || a.energy - b.energy)
     .map((m, i) => ({ ...m, rank: i + 1 }));
 }
