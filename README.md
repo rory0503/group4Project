@@ -24,7 +24,7 @@ winget install OpenJS.NodeJS.LTS
 
 **2. Install the backend packages**
 ```bash
-python -m pip install "fastapi[standard]" requests sqlalchemy pymysql cryptography
+python -m pip install "fastapi[standard]" requests sqlalchemy pymysql cryptography "pwdlib[argon2]"
 ```
 
 **3. Create the database** (in HeidiSQL or MySQL Workbench)

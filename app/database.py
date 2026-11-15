@@ -2,6 +2,7 @@ from app.databaseConfig import SessionLocal
 from sqlalchemy.orm import Session
 from app.models.model import Model
 from app.models.provider import Provider
+from app.models.user import User
 from sqlalchemy import text
 
 #create a database session that closes after use
@@ -71,3 +72,10 @@ def deleteAllProvidersAndModels(db: Session):
         print("Error deleting providers and models:")
         print(str(error))
         raise
+
+def writeUser(db: Session, user: User):
+    db.add(user)
+    db.commit()
+
+def readUser(db: Session, email: str):
+    return db.query(User).filter(User.email == email).first()
