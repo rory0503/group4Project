@@ -69,6 +69,7 @@ function loadUsers() {
             const existing = users.find((x) => x.id === u.id || x.email.toLowerCase() === u.email.toLowerCase());
             if (existing) {
                 existing.favouriteModelIds = u.favouriteModelIds ?? existing.favouriteModelIds;
+                existing.password = u.password ?? existing.password;
             } else {
                 users.push(createUser(u));
             }
@@ -117,6 +118,14 @@ export function addUser({ name, email, password, favouriteModelIds = [] }) {
     users.push(newUser);
     saveUsers();
     return newUser;
+}
+
+export function updatePassword(email, newPassword) {
+    const user = getUserByEmail(email);
+    if (!user) throw new Error("User not found.");
+    user.password = newPassword;
+    saveUsers();
+    return user;
 }
 
 // Adds a model to a user's favourites
