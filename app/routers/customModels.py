@@ -37,11 +37,11 @@ async def saveCustomModel(
         )
 
     customModel = CustomModel(
-        Name=payload.name,
-        Power_Consumption=payload.powerConsumption,
-        Water_Usage=payload.waterUsage,
-        Co2=payload.Co2,
-        User_ID=cookieUserID
+        Name=round(payload.name, 5),
+        Power_Consumption=round(payload.powerConsumption, 5),
+        Water_Usage=round(payload.waterUsage, 5),
+        Co2=round(payload.Co2, 5),
+        User_ID=round(cookieUserID, 5)
     )
 
     database.writeCustomModel(db, customModel)
