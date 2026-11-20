@@ -1,29 +1,45 @@
+
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Lightbulb, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  T,
+  useTranslatedText,
+} from "../../context/TranslationContext";
 
-//roatating card that shows one suistainability tip at a time. The user can click to go to the next or previous tip, or click the dots to jump to a specific tip. The tips automatically rotate every 10 seconds unless the user hovers over the card or focuses it with the keyboard.
 export default function TipsElement({ tips }) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
 
-  // Move to the next tip every 10 seconds, unless paused or the user prefers less motion.
-  // Clicking changes `index`, which restarts the timer.
+  // Translated carousel accessibility labels
+  const chooseTipLabel = useTranslatedText("Choose tip");
+  const previousTipLabel = useTranslatedText("Previous tip");
+  const nextTipLabel = useTranslatedText("Next tip");
+  const tipLabel = useTranslatedText("Tip");
+
   useEffect(() => {
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
     if (paused || reduceMotion || tips.length < 2) return;
-    const timer = setInterval(() => setIndex((i) => (i + 1) % tips.length), 10000);
+
+    const timer = setInterval(
+      () => setIndex((i) => (i + 1) % tips.length),
+      10000
+    );
+
     return () => clearInterval(timer);
   }, [paused, index, tips.length]);
 
   if (tips.length === 0) return null;
-  //current tip.
+
   const tip = tips[index];
-  // jump to a specific tip.
-  const go = (i) => setIndex((i + tips.length) % tips.length);
+
+  const go = (i) =>
+    setIndex((i + tips.length) % tips.length);
 
   return (
-    // pauses the auto-rotation when a mouse hovers over the card or button.
     <div
       className="card tip"
       aria-roledescription="carousel"
@@ -32,36 +48,58 @@ export default function TipsElement({ tips }) {
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
     >
-      <span className="tip-icon"><Lightbulb className="icon icon-lg" /></span>
+      <span className="tip-icon">
+        <Lightbulb className="icon icon-lg" />
+      </span>
 
       <div aria-live="polite">
-        <h3>Tip {index + 1} — {tip.title}</h3>
-        <p>{tip.body}</p>
+        <h3>
+          <T>Tip</T> {index + 1} — <T>{tip.title}</T>
+        </h3>
+
+        <p>
+          <T>{tip.body}</T>
+        </p>
       </div>
 
       <div className="tip-controls">
-        {/* links tips to information page. */}
-        <Link className="link-btn" to="/information#tips">Learn more</Link>
+        <Link className="link-btn" to="/information#tips">
+          <T>Learn more</T>
+        </Link>
 
-        {/* one dot per tip, dot for currently selected tip is highlighted */}
-        <div className="dots" role="group" aria-label="Choose tip">
+        <div
+          className="dots"
+          role="group"
+          aria-label={chooseTipLabel}
+        >
           {tips.map((_, i) => (
             <button
               key={i}
               className="dot"
               type="button"
-              aria-label={`Tip ${i + 1}`}
+              aria-label={`${tipLabel} ${i + 1}`}
               aria-current={i === index ? "true" : undefined}
               onClick={() => go(i)}
             />
           ))}
         </div>
-        {/* arrows for previous and next tip. */}
+
         <div className="tip-nav">
-          <button className="page-btn" type="button" aria-label="Previous tip" onClick={() => go(index - 1)}>
+          <button
+            className="page-btn"
+            type="button"
+            aria-label={previousTipLabel}
+            onClick={() => go(index - 1)}
+          >
             <ChevronLeft className="icon icon-sm" />
           </button>
-          <button className="page-btn" type="button" aria-label="Next tip" onClick={() => go(index + 1)}>
+
+          <button
+            className="page-btn"
+            type="button"
+            aria-label={nextTipLabel}
+            onClick={() => go(index + 1)}
+          >
             <ChevronRight className="icon icon-sm" />
           </button>
         </div>

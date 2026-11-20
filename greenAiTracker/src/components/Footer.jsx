@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { Leaf } from "lucide-react"; //leaf icon in footer
+import { Leaf } from "lucide-react";
+import { T } from "../context/TranslationContext";
 
 export default function Footer() {
   return (
@@ -8,31 +9,78 @@ export default function Footer() {
         <div className="footer-grid">
           <div className="footer-about">
             <Link className="brand" to="/">
-              <span className="brand-mark"><Leaf className="icon icon-sm" /></span>
+              <span className="brand-mark">
+                <Leaf className="icon icon-sm" />
+              </span>
               <span>Green AI Tracker</span>
             </Link>
-            <p>Track and compare the water, energy and carbon footprint of AI models — and make more sustainable choices.</p>
+
+            <p>
+              <T>
+                Track and compare the water, energy and carbon footprint of AI models — and make more sustainable choices.
+              </T>
+            </p>
           </div>
+
           <div>
-            <h2>Explore</h2>
+            <h2>
+              <T>Explore</T>
+            </h2>
+
             <ul>
-              <li><Link to="/">Dashboard</Link></li>
-              <li><Link to="/rankings">Rankings</Link></li>
-              <li><Link to="/compare">Compare models</Link></li>
+              <li>
+                <Link to="/">
+                  <T>Dashboard</T>
+                </Link>
+              </li>
+              <li>
+                <Link to="/rankings">
+                  <T>Rankings</T>
+                </Link>
+              </li>
+              <li>
+                <Link to="/compare">
+                  <T>Compare models</T>
+                </Link>
+              </li>
             </ul>
           </div>
+
           <div>
-            <h2>About</h2>
+            <h2>
+              <T>About</T>
+            </h2>
+
             <ul>
-              <li><Link to="/information#sources">Source list</Link></li>
-              <li><Link to="/information#methodology">How scores work</Link></li>
-              <li><Link to="/information#contact">Contact information</Link></li>
+              <li>
+                <Link to="/information#sources">
+                  <T>Source list</T>
+                </Link>
+              </li>
+              <li>
+                <Link to="/information#methodology">
+                  <T>How scores work</T>
+                </Link>
+              </li>
+              <li>
+                <Link to="/information#contact">
+                  <T>Contact information</T>
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
+
         <div className="footer-bottom">
-          <span>© {new Date().getFullYear()} Green AI Tracker</span>
-          <span>Figures shown are illustrative estimates and vary by task and infrastructure.</span>
+          <span>
+            © {new Date().getFullYear()} Green AI Tracker
+          </span>
+
+          <span>
+            <T>
+              Figures shown are illustrative estimates and vary by task and infrastructure.
+            </T>
+          </span>
         </div>
       </div>
     </footer>

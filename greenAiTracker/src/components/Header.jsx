@@ -1,8 +1,27 @@
 import { useEffect, useState } from "react";
-import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-import { Leaf, Menu, X, Moon, Sun, Globe, User, LogOut } from "lucide-react";
+import {
+  Link,
+  NavLink,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+import {
+  Leaf,
+  Menu,
+  X,
+  Moon,
+  Sun,
+  Globe,
+  User,
+  LogOut,
+} from "lucide-react";
 import { useAuth } from "../context/AuthContext";
-import useLocalStorage from "../hooks/useLocalStorage";
+import {
+  useTranslation,
+  LANGUAGES,
+  T,
+  useTranslatedText,
+} from "../context/TranslationContext";
 
 // Main navigation links (the Profile link is added separately, only when logged in)
 const NAV = [
@@ -12,27 +31,43 @@ const NAV = [
   { to: "/information", label: "Information" },
 ];
 
-const LANGS = [
-  ["en", "EN"],
-  ["fr", "FR"],
-  ["es", "ES"],
-  ["de", "DE"],
-];
+const LANGS = LANGUAGES;
 
 export default function Header() {
-  // Login state comes from AuthContext, so the header updates as soon as someone logs in or out
+  // Login state comes from AuthContext
   const { isLoggedIn, user, logout } = useAuth();
+
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Theme and language are saved in the browser (stored as "gat-settings")
-  const [settings, setSettings] = useLocalStorage("settings", { theme: "light", lang: "en" });
+  // Theme and language settings
+  const { settings, setSettings, setLanguage } = useTranslation();
+
   const theme = settings.theme === "dark" ? "dark" : "light";
 
   // Mobile menu open/closed
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // Apply the theme to the whole page (styles.css reads :root[data-theme="dark"])
+  // Translated accessibility labels
+  const mobileMenuLabel = useTranslatedText(
+    menuOpen ? "Close menu" : "Open menu"
+  );
+
+  const mainNavigationLabel = useTranslatedText("Main");
+
+  const themeLabel = useTranslatedText(
+    theme === "dark"
+      ? "Switch to light theme"
+      : "Switch to dark theme"
+  );
+
+  const languageLabel = useTranslatedText("Language");
+
+  const logoutLabel = useTranslatedText("Log out");
+
+  const profileLabel = useTranslatedText("Profile");
+
+  // Apply the theme to the whole page
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
   }, [theme]);
@@ -43,11 +78,14 @@ export default function Header() {
   }, [location.pathname]);
 
   function toggleTheme() {
-    setSettings({ ...settings, theme: theme === "dark" ? "light" : "dark" });
+    setSettings({
+      ...settings,
+      theme: theme === "dark" ? "light" : "dark",
+    });
   }
 
   function changeLang(e) {
-    setSettings({ ...settings, lang: e.target.value });
+    setLanguage(e.target.value);
   }
 
   function handleLogout() {
@@ -60,7 +98,9 @@ export default function Header() {
       <div className="container nav">
         {/* Logo */}
         <Link className="brand" to="/">
-          <span className="brand-mark"><Leaf className="icon icon-sm" /></span>
+          <span className="brand-mark">
+            <Leaf className="icon icon-sm" />
+          </span>
           <span>Green AI Tracker</span>
         </Link>
 
@@ -70,19 +110,27 @@ export default function Header() {
           type="button"
           aria-expanded={menuOpen}
           aria-controls="nav-menu"
-          aria-label={menuOpen ? "Close menu" : "Open menu"}
+          aria-label={mobileMenuLabel}
           onClick={() => setMenuOpen((open) => !open)}
         >
-          {menuOpen ? <X className="icon" /> : <Menu className="icon" />}
+          {menuOpen ? (
+            <X className="icon" />
+          ) : (
+            <Menu className="icon" />
+          )}
         </button>
 
-        <nav id="nav-menu" className={`nav-menu${menuOpen ? " open" : ""}`} aria-label="Main">
-          {/* Page links: NavLink adds the "active" class to the current page */}
+        <nav
+          id="nav-menu"
+          className={`nav-menu${menuOpen ? " open" : ""}`}
+          aria-label={mainNavigationLabel}
+        >
+          {/* Page links */}
           <ul className="nav-links">
             {NAV.map((item) => (
               <li key={item.to}>
                 <NavLink to={item.to} end={item.to === "/"}>
-                  {item.label}
+                  <T>{item.label}</T>
                 </NavLink>
               </li>
             ))}
@@ -94,18 +142,32 @@ export default function Header() {
               className="icon-btn"
               type="button"
               onClick={toggleTheme}
-              aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+              aria-label={themeLabel}
             >
-              {theme === "dark" ? <Sun className="icon" /> : <Moon className="icon" />}
+              {theme === "dark" ? (
+                <Sun className="icon" />
+              ) : (
+                <Moon className="icon" />
+              )}
             </button>
 
-            {/* Language (translations aren't built yet) */}
+            {/* Language */}
             <label className="lang">
               <Globe className="icon icon-sm" />
-              <span className="sr-only">Language</span>
-              <select value={settings.lang} onChange={changeLang}>
+
+              <span className="sr-only">
+                {languageLabel}
+              </span>
+
+              <select
+                value={settings.lang}
+                onChange={changeLang}
+                aria-label={languageLabel}
+              >
                 {LANGS.map(([value, label]) => (
-                  <option key={value} value={value}>{label}</option>
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
                 ))}
               </select>
             </label>
@@ -113,18 +175,31 @@ export default function Header() {
             {/* Logged in: Profile + Log out. Logged out: Log in. */}
             {isLoggedIn ? (
               <>
-                <NavLink className="nav-cta" to="/profile" title={user?.name}>
+                <NavLink
+                  className="nav-cta"
+                  to="/profile"
+                  title={user?.name}
+                >
                   <User className="icon icon-sm" />
-                  <span>Profile</span>
+                  <span>{profileLabel}</span>
                 </NavLink>
-                <button className="icon-btn" type="button" onClick={handleLogout} aria-label="Log out">
+
+                <button
+                  className="icon-btn"
+                  type="button"
+                  onClick={handleLogout}
+                  aria-label={logoutLabel}
+                  title={logoutLabel}
+                >
                   <LogOut className="icon" />
                 </button>
               </>
             ) : (
               <NavLink className="nav-cta" to="/login">
                 <User className="icon icon-sm" />
-                <span>Log in</span>
+                <span>
+                  <T>Log in</T>
+                </span>
               </NavLink>
             )}
           </div>

@@ -1,6 +1,10 @@
 import { useId, useState } from "react";
 import { Search } from "lucide-react";
 import Avatar from "./Avatar";
+import {
+  T,
+  useTranslatedText,
+} from "../context/TranslationContext";
 
 export default function ModelPicker({
   models,
@@ -11,17 +15,26 @@ export default function ModelPicker({
   exclude = [],
 }) {
   const uid = useId();
+
   const selected = models.find((m) => m.id === value);
 
-  const [text, setText] = useState(null); // null = not typing, so show the chosen model's name
+  const [text, setText] = useState(null);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
 
+  // Translate the input label and placeholder
+  const translatedLabel = useTranslatedText(label);
+
+  const translatedPlaceholder = useTranslatedText(placeholder);
+
   const query = (text ?? "").trim().toLowerCase();
+
   const options = models.filter(
     (m) =>
       !exclude.includes(m.id) &&
-      (!query || m.name.includes(query) || m.company.toLowerCase().includes(query))
+      (!query ||
+        m.name.includes(query) ||
+        m.company.toLowerCase().includes(query))
   );
 
   function choose(id) {
@@ -33,13 +46,21 @@ export default function ModelPicker({
   function handleKeyDown(e) {
     if (e.key === "ArrowDown" || e.key === "ArrowUp") {
       e.preventDefault();
+
       if (!open) return setOpen(true);
       if (options.length === 0) return;
+
       const step = e.key === "ArrowDown" ? 1 : -1;
-      setActive((a) => (a + step + options.length) % options.length);
+
+      setActive(
+        (a) => (a + step + options.length) % options.length
+      );
     } else if (e.key === "Enter") {
       e.preventDefault();
-      if (open && options[active]) choose(options[active].id);
+
+      if (open && options[active]) {
+        choose(options[active].id);
+      }
     } else if (e.key === "Escape") {
       setText(null);
       setOpen(false);
@@ -57,13 +78,24 @@ export default function ModelPicker({
           aria-autocomplete="list"
           aria-expanded={open}
           aria-controls={`${uid}-list`}
-          aria-activedescendant={open && options.length ? `${uid}-o${active}` : undefined}
-          aria-label={label}
-          placeholder={placeholder}
+          aria-activedescendant={
+            open && options.length
+              ? `${uid}-o${active}`
+              : undefined
+          }
+          aria-label={translatedLabel}
+          placeholder={translatedPlaceholder}
           value={text ?? selected?.name ?? ""}
           onFocus={(e) => {
             e.target.select();
-            setActive(Math.max(0, options.findIndex((m) => m.id === value)));
+
+            setActive(
+              Math.max(
+                0,
+                options.findIndex((m) => m.id === value)
+              )
+            );
+
             setOpen(true);
           }}
           onChange={(e) => {
@@ -77,26 +109,40 @@ export default function ModelPicker({
             setOpen(false);
           }}
         />
-        <span className="input-icon"><Search className="icon icon-sm" /></span>
+
+        <span className="input-icon">
+          <Search className="icon icon-sm" />
+        </span>
       </div>
 
-      <ul className="picker-list" id={`${uid}-list`} role="listbox" hidden={!open}>
+      <ul
+        className="picker-list"
+        id={`${uid}-list`}
+        role="listbox"
+        hidden={!open}
+      >
         {options.length === 0 && (
-          <li className="picker-empty">No models match “{text}”</li>
+          <li className="picker-empty">
+            <T>No models match</T> “{text}”
+          </li>
         )}
+
         {options.map((m, i) => (
           <li
             key={m.id}
             id={`${uid}-o${i}`}
-            className={`picker-option${m.id === value ? " current" : ""}`}
+            className={`picker-option${
+              m.id === value ? " current" : ""
+            }`}
             role="option"
             aria-selected={i === active}
             onMouseDown={(e) => {
-              e.preventDefault(); // keep focus so the list doesn't close before the click lands
+              e.preventDefault();
               choose(m.id);
             }}
           >
             <Avatar company={m.company} />
+
             <span>
               <span>{m.name}</span>
               <small>{m.company}</small>

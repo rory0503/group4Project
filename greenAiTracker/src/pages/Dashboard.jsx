@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Download, ArrowRight, X } from "lucide-react";
 import useLocalStorage from "../hooks/useLocalStorage";
@@ -13,12 +13,14 @@ import ModelPicker from "../components/ModelPicker";
 import ModelTable from "../components/ModelTable";
 import TrendChart from "../components/TrendChart";
 import useFavourites, { favouritesFirst } from "../hooks/useFavourites";
+import { T, useTranslation } from "../context/TranslationContext";
 import "../styles/dashboard.css";
 
 export default function Dashboard() {
   const { models, loading, error } = useModels();
   const [primaryId, setPrimaryId] = useLocalStorage("selected", "");
-  // the defaults saved on the Profile page (default metric and time range)
+
+  // The defaults saved on the Profile page
   const [profileSettings] = useLocalStorage("profile-settings", {});
   const [secondId, setSecondId] = useState(null);
   const [metric, setMetric] = useState(profileSettings.metric ?? "water");
@@ -26,91 +28,188 @@ export default function Dashboard() {
   const [range, setRange] = useState(profileSettings.range ?? "all");
   const [sort, setSort] = useState({ key: "score", dir: "desc" });
   const [favourites] = useFavourites();
+
+  const { lang, translateTexts } = useTranslation();
+
+  const [dashboardText, setDashboardText] = useState({
+    keyFigures: "Key figures",
+    removeSecondModel: "Remove second model",
+    modelLabel: "Model",
+    compareWithLabel: "Compare with",
+    addSecondModel: "Add a second model",
+  });
+
+  useEffect(() => {
+    let active = true;
+
+    const originalTexts = [
+      "Key figures",
+      "Remove second model",
+      "Model",
+      "Compare with",
+      "Add a second model",
+    ];
+
+    translateTexts(originalTexts).then((translated) => {
+      if (!active || !Array.isArray(translated)) return;
+
+      setDashboardText({
+        keyFigures: translated[0] || originalTexts[0],
+        removeSecondModel: translated[1] || originalTexts[1],
+        modelLabel: translated[2] || originalTexts[2],
+        compareWithLabel: translated[3] || originalTexts[3],
+        addSecondModel: translated[4] || originalTexts[4],
+      });
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [lang, translateTexts]);
+
   const pickerModels = favouritesFirst(models, favourites);
 
-  // find model by id or default to first model
+  // Find model by id or default to first model
   const model = byId(models, primaryId) ?? models[0];
   const meta = METRICS[metric];
 
-  // Clicking the same heading flips the direction; a new heading starts ascending
-  // (the score starts highest first).
+  // Sorting functionality
   function handleSort(key) {
     setSort((s) => ({
       key,
-      dir: s.key === key ? (s.dir === "asc" ? "desc" : "asc") : key === "score" ? "desc" : "asc",
+      dir:
+        s.key === key
+          ? s.dir === "asc"
+            ? "desc"
+            : "asc"
+          : key === "score"
+            ? "desc"
+            : "asc",
     }));
   }
 
-  // The top 3 models by score, plus the models being viewed, which is displayed at top of table.
-  const ids = new Set(sortModels(models, "score", "desc").slice(0, 3).map((m) => m.id));
+  // Top 3 models by score, plus selected models
+  const ids = new Set(
+    sortModels(models, "score", "desc")
+      .slice(0, 3)
+      .map((m) => m.id)
+  );
+
   if (model) ids.add(model.id);
   if (secondId) ids.add(secondId);
-  const tableModels = sortModels(models.filter((m) => ids.has(m.id)), sort.key, sort.dir);
 
-  // The lines on the chart: the chosen model, plus the second model if there is one.
-  // (slot 0 and 1 pick the line colours.)
+  const tableModels = sortModels(
+    models.filter((m) => ids.has(m.id)),
+    sort.key,
+    sort.dir
+  );
+
+  // Models displayed on the chart
   const second = secondId ? byId(models, secondId) : null;
-  const chartItems = [{ model, slot: 0 }, ...(second ? [{ model: second, slot: 1 }] : [])];
 
-  //message at top of page containing chosen models name.
+  const chartItems = [
+    { model, slot: 0 },
+    ...(second ? [{ model: second, slot: 1 }] : []),
+  ];
+
   return (
     <main id="main" className="page">
       <div className="container">
+
         <div className="page-head">
           <div>
-            <h1>AI Model Expenditure</h1>
+            <h1>
+              <T>AI Model Expenditure</T>
+            </h1>
+
             {model && (
-              <p>The yearly resource footprint of <strong>{model.name}</strong>, and how it compares.</p>
+              <p>
+                <T>The yearly resource footprint of</T>{" "}
+                <strong>{model.name}</strong>
+                <T>, and how it compares.</T>
+              </p>
             )}
           </div>
         </div>
 
-        {/* There for when the backend is connected, showing if the data is loading, if there is an error or if there are no models available. */}
-        {loading && <p className="card">Loading model data…</p>}
-        {error && <div className="notice">We couldn't load the model data. Try again in a moment.</div>}
-        {!loading && !error && !model && <p className="card">No models are available yet.</p>}
+        {/* Loading, error and empty states */}
+        {loading && (
+          <p className="card">
+            <T>Loading model data…</T>
+          </p>
+        )}
 
-        {/* If a model is selected, show the dashboard content. */}
+        {error && (
+          <div className="notice">
+            <T>We couldn't load the model data. Try again in a moment.</T>
+          </div>
+        )}
+
+        {!loading && !error && !model && (
+          <p className="card">
+            <T>No models are available yet.</T>
+          </p>
+        )}
+
+        {/* Dashboard content */}
         {model && (
           <>
-            {/* statcards for each metric of model. */}
-            <section className="stats" aria-label="Key figures">
+            {/* Statistics cards */}
+            <section className="stats" aria-label={dashboardText.keyFigures}>
               {Object.values(METRICS).map((m) => (
-                <StatCard key={m.key} meta={m} model={model} average={average(models, m.key)} />
+                <StatCard
+                  key={m.key}
+                  meta={m}
+                  model={model}
+                  average={average(models, m.key)}
+                />
               ))}
             </section>
-            {/* model picker. */}
+
+            {/* Model selection and chart controls */}
             <section className="section" aria-labelledby="trend-title">
               <div className="toolbar">
+
                 <div className="field">
-                  <span className="label">Model</span>
+                  <span className="label">
+                    <T>Model</T>
+                  </span>
+
                   <ModelPicker
                     models={pickerModels}
                     value={model.id}
                     onChange={setPrimaryId}
-                    label="Model"
+                    label={dashboardText.modelLabel}
                     exclude={secondId ? [secondId] : []}
                   />
                 </div>
-                {/* model picker for comparison. */}
+
+                {/* Second model comparison */}
                 <div className="field">
-                  <span className="label">Compare with <span className="hint">(optional)</span></span>
+                  <span className="label">
+                    <T>Compare with</T>{" "}
+                    <span className="hint">
+                      (<T>optional</T>)
+                    </span>
+                  </span>
+
                   <div style={{ display: "flex", gap: 8 }}>
                     <div style={{ flex: 1 }}>
                       <ModelPicker
                         models={pickerModels}
                         value={secondId}
                         onChange={setSecondId}
-                        label="Compare with"
-                        placeholder="Add a second model"
+                        label={dashboardText.compareWithLabel}
+                        placeholder={dashboardText.addSecondModel}
                         exclude={[model.id]}
                       />
                     </div>
+
                     {secondId && (
                       <button
                         className="btn btn-outline"
                         type="button"
-                        aria-label="Remove second model"
+                        aria-label={dashboardText.removeSecondModel}
                         onClick={() => setSecondId(null)}
                       >
                         <X className="icon icon-sm" />
@@ -118,50 +217,108 @@ export default function Dashboard() {
                     )}
                   </div>
                 </div>
-                {/* change view of the chart to be per year or cumulative. */}
+
+                {/* Chart view */}
                 <div className="field">
-                  <label className="label" htmlFor="mode">View</label>
-                  <select className="select" id="mode" value={mode} onChange={(e) => setMode(e.target.value)}>
-                    <option value="year">Per year</option>
-                    <option value="cumulative">Cumulative</option>
+                  <label className="label" htmlFor="mode">
+                    <T>View</T>
+                  </label>
+
+                  <select
+                    className="select"
+                    id="mode"
+                    value={mode}
+                    onChange={(e) => setMode(e.target.value)}
+                  >
+                    <option value="year">
+                      <T>Per year</T>
+                    </option>
+
+                    <option value="cumulative">
+                      <T>Cumulative</T>
+                    </option>
                   </select>
                 </div>
-                {/* time range for graph. */}
+
+                {/* Chart time range */}
                 <div className="field">
-                  <label className="label" htmlFor="range">Time range</label>
-                  <select className="select" id="range" value={range} onChange={(e) => setRange(e.target.value)}>
+                  <label className="label" htmlFor="range">
+                    <T>Time range</T>
+                  </label>
+
+                  <select
+                    className="select"
+                    id="range"
+                    value={range}
+                    onChange={(e) => setRange(e.target.value)}
+                  >
                     <option value="all">2020 – 2030</option>
-                    <option value="last5">Last 5 years</option>
-                    <option value="proj">Projection only</option>
+                    <option value="last5">
+                      <T>Last 5 years</T>
+                    </option>
+                    <option value="proj">
+                      <T>Projection only</T>
+                    </option>
                   </select>
                 </div>
+
               </div>
 
+              {/* Chart layout */}
               <div className="chart-layout">
+
                 <div className="card chart-card">
                   <div className="chart-head">
-                    <h2 id="trend-title">{meta.title} over time</h2>
+                    <h2 id="trend-title">
+                      <T>{meta.title}</T>{" "}
+                      <T>over time</T>
+                    </h2>
                   </div>
-                  {/* the line chart, with its own key (legend) and axis labels */}
-                  <TrendChart items={chartItems} metric={metric} mode={mode} range={range} />
+
+                  <TrendChart
+                    items={chartItems}
+                    metric={metric}
+                    mode={mode}
+                    range={range}
+                  />
                 </div>
 
                 <div className="card">
-                  <MetricPicker value={metric} onChange={setMetric} />
+                  <MetricPicker
+                    value={metric}
+                    onChange={setMetric}
+                  />
                 </div>
+
               </div>
             </section>
-            {/* table info. */}
+
+            {/* Rankings table */}
             <section className="section" aria-labelledby="table-title">
               <div className="section-head">
+
                 <div>
-                  <h2 id="table-title">How it ranks</h2>
-                  <p>Top 3 models by sustainability score, plus the model you're viewing.</p>
+                  <h2 id="table-title">
+                    <T>How it ranks</T>
+                  </h2>
+
+                  <p>
+                    <T>
+                      Top 3 models by sustainability score, plus the model you're viewing.
+                    </T>
+                  </p>
                 </div>
-                {/* export data button. */}
-                <button className="btn btn-outline" type="button" onClick={() => exportCsv(models)}>
-                  <Download className="icon icon-sm" />Export data
+
+                {/* Export data */}
+                <button
+                  className="btn btn-outline"
+                  type="button"
+                  onClick={() => exportCsv(models)}
+                >
+                  <Download className="icon icon-sm" />
+                  <T>Export data</T>
                 </button>
+
               </div>
 
               <ModelTable
@@ -172,18 +329,27 @@ export default function Dashboard() {
                 showRank
               />
 
-              <Link className="btn btn-primary btn-block" to="/rankings" style={{ marginTop: 12 }}>
-                View full rankings<ArrowRight className="icon icon-sm" />
+              <Link
+                className="btn btn-primary btn-block"
+                to="/rankings"
+                style={{ marginTop: 12 }}
+              >
+                <T>View full rankings</T>
+                <ArrowRight className="icon icon-sm" />
               </Link>
             </section>
 
-            {/* tips element at bottom of webpage. */}
+            {/* Sustainable AI tips */}
             <section className="section" aria-labelledby="tips-title">
               <div className="section-head">
-                <h2 id="tips-title">Sustainable AI prompt tips</h2>
+                <h2 id="tips-title">
+                  <T>Sustainable AI prompt tips</T>
+                </h2>
               </div>
+
               <TipsElement tips={tips} />
             </section>
+
           </>
         )}
       </div>

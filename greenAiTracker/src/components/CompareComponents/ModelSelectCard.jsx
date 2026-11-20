@@ -1,37 +1,73 @@
+import { useEffect, useState } from "react";
 import { X, Plus } from "lucide-react";
 import ModelPicker from "../ModelPicker";
 import { byId } from "../../lib/helpers";
 import { companyColors } from "../../data/models";
+import { T, useTranslation } from "../../context/TranslationContext";
 
-// Used for the "add a ___ model"
 const ORDINAL = ["first", "second", "third"];
 
-// One of the three "pick a model" slots at the top of the Compare page.
 export default function ModelSelectCard({ slot, models, value, onChange, exclude }) {
   const model = byId(models, value);
-  // --c drives the coloured top border and dot (green / blue / orange)
   const slotColor = { "--c": `var(--slot-${slot})` };
+  const { lang, translateTexts } = useTranslation();
 
-  // Empty slot: dashed card with a plus icon
+  const [labels, setLabels] = useState({
+    remove: "Remove",
+    addModel: "Add model",
+    changeModel: "Change model",
+    searchModels: "Search models",
+  });
+
+  useEffect(() => {
+    let active = true;
+
+    const originalTexts = [
+      "Remove",
+      "Add model",
+      "Change model",
+      "Search models",
+    ];
+
+    translateTexts(originalTexts).then((translated) => {
+      if (!active || !Array.isArray(translated)) return;
+
+      setLabels({
+        remove: translated[0] || originalTexts[0],
+        addModel: translated[1] || originalTexts[1],
+        changeModel: translated[2] || originalTexts[2],
+        searchModels: translated[3] || originalTexts[3],
+      });
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [lang, translateTexts]);
+
   if (!model) {
     return (
       <article className="card slot slot-empty" style={slotColor}>
         <span className="slot-add-icon" aria-hidden="true">
           <Plus className="icon" />
         </span>
-        {/* add a first/scond/third model text */}
+
         <div>
-          <div className="name">Add a {ORDINAL[slot - 1]} model</div>
-          <p className="card-sub">Compare up to 3 models at once</p>
+          <div className="name">
+            <T>{`Add a ${ORDINAL[slot - 1]} model`}</T>
+          </div>
+          <p className="card-sub">
+            <T>Compare up to 3 models at once</T>
+          </p>
         </div>
-        {/*search box to choose a model, 'exclude' hides models already picked*/}
+
         <div className="field" style={{ width: "100%" }}>
           <ModelPicker
             models={models}
             value={null}
             onChange={onChange}
-            label={`Add model ${slot}`}
-            placeholder="Search models"
+            label={`${labels.addModel} ${slot}`}
+            placeholder={labels.searchModels}
             exclude={exclude}
           />
         </div>
@@ -39,29 +75,26 @@ export default function ModelSelectCard({ slot, models, value, onChange, exclude
     );
   }
 
-  // Filled slot
-  //Letter shown in the coloured square logo
   const initial = model.company === "Mistral AI" ? "Mi" : model.company.charAt(0);
 
   return (
     <article className="card slot" style={slotColor}>
-      {/* Top row: "Model 1/2/3" label and a remove (X) button */}
       <div className="slot-top">
         <span className="slot-label">
           <span className="slot-dot" />
-          Model {slot}
+          <T>{`Model ${slot}`}</T>
         </span>
+
         <button
           className="slot-remove"
           type="button"
-          aria-label={`Remove ${model.name}`}
+          aria-label={`${labels.remove} ${model.name}`}
           onClick={() => onChange(null)}
         >
           <X className="icon icon-sm" />
         </button>
       </div>
 
-      {/* Company square, model name, company and rank */}
       <div className="model-cell slot-model">
         <span
           className="avatar avatar-lg"
@@ -70,23 +103,26 @@ export default function ModelSelectCard({ slot, models, value, onChange, exclude
         >
           {initial}
         </span>
+
         <div>
           <div className="name">{model.name}</div>
           <div className="company">
-            {model.company} · Rank #{model.rank}
+            {model.company} · <T>Rank</T> #{model.rank}
           </div>
         </div>
       </div>
 
-      {/* Search box to swap this slot for a different model */}
       <div className="field">
-        <span className="label">Change model</span>
+        <span className="label">
+          <T>Change model</T>
+        </span>
+
         <ModelPicker
           models={models}
           value={value}
           onChange={onChange}
-          label={`Change model ${slot}`}
-          placeholder="Search models"
+          label={`${labels.changeModel} ${slot}`}
+          placeholder={labels.searchModels}
           exclude={exclude}
         />
       </div>

@@ -1,8 +1,8 @@
 import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import Avatar from "./Avatar";
 import { fmtInt } from "../lib/helpers";
+import { T } from "../context/TranslationContext";
 
-// Column definitions: key = field to sort by, label = heading, unit = small text under heading, right = right-align
 const COLS = [
   { key: "name", label: "Model", right: false },
   { key: "water", label: "Water", unit: "Litres", right: true },
@@ -11,89 +11,153 @@ const COLS = [
   { key: "score", label: "Score", unit: "out of 12", right: true },
 ];
 
-// One clickable column heading
 function Th({ col, sort, onSort }) {
   const active = sort.key === col.key;
-  const Icon = active ? (sort.dir === "asc" ? ArrowUp : ArrowDown) : ArrowUpDown;
-  const ariaSort = active ? (sort.dir === "asc" ? "ascending" : "descending") : undefined;
+
+  const Icon = active
+    ? sort.dir === "asc"
+      ? ArrowUp
+      : ArrowDown
+    : ArrowUpDown;
+
+  const ariaSort = active
+    ? sort.dir === "asc"
+      ? "ascending"
+      : "descending"
+    : undefined;
 
   return (
-    <th className={col.right ? "r" : ""} scope="col" aria-sort={ariaSort}>
-      {/* Button that triggers sorting by this column */}
-      <button className="sort-btn" type="button" onClick={() => onSort(col.key)}>
+    <th
+      className={col.right ? "r" : ""}
+      scope="col"
+      aria-sort={ariaSort}
+    >
+      <button
+        className="sort-btn"
+        type="button"
+        onClick={() => onSort(col.key)}
+      >
         {col.right && <Icon className="icon icon-sm" />}
-        {/* Heading text and optional unit */}
+
         <span>
-          {col.label}
-          {col.unit && <span className="unit">{col.unit}</span>}
+          <T>{col.label}</T>
+
+          {col.unit && (
+            <span className="unit">
+              {col.unit === "out of 12" ? (
+                <>
+                  <T>out of</T> 12
+                </>
+              ) : (
+                col.unit
+              )}
+            </span>
+          )}
         </span>
+
         {!col.right && <Icon className="icon icon-sm" />}
       </button>
     </th>
   );
 }
 
-export default function ModelTable({ models, selectedId, sort, onSort, showRank = false }) {
-  // Copy of the list with the selected model moved to the top (ranks are not changed)
+export default function ModelTable({
+  models,
+  selectedId,
+  sort,
+  onSort,
+  showRank = false,
+}) {
   const orderedModels = [...models].sort(
     (a, b) => (b.id === selectedId) - (a.id === selectedId)
   );
 
   return (
-    // Wrapper around the table (handles scrolling/styling)
     <div className="table-wrap">
       <table className="data-table">
-        {/* Hidden label for screen readers */}
-        <caption className="sr-only">Models by sustainability score</caption>
+        <caption className="sr-only">
+          <T>Models by sustainability score</T>
+        </caption>
+
         <thead>
           <tr>
-            {/* Optional Rank heading */}
-            {showRank && <Th col={{ key: "rank", label: "Rank", right: false }} sort={sort} onSort={onSort} />}
-            {/* One heading per column */}
+            {showRank && (
+              <Th
+                col={{ key: "rank", label: "Rank", right: false }}
+                sort={sort}
+                onSort={onSort}
+              />
+            )}
+
             {COLS.map((col) => (
-              <Th key={col.key} col={col} sort={sort} onSort={onSort} />
+              <Th
+                key={col.key}
+                col={col}
+                sort={sort}
+                onSort={onSort}
+              />
             ))}
           </tr>
         </thead>
+
         <tbody>
-          {/* Shown when there are no models */}
           {orderedModels.length === 0 && (
             <tr>
-              <td colSpan={COLS.length + (showRank ? 1 : 0)}>No models to show.</td>
+              <td colSpan={COLS.length + (showRank ? 1 : 0)}>
+                <T>No models to show.</T>
+              </td>
             </tr>
           )}
 
           {orderedModels.map((m) => {
             const selected = m.id === selectedId;
+
             return (
-              // One row per model, highlighted if selected
-              <tr key={m.id} className={`row${selected ? " is-selected" : ""}`}>
-                {/* Model's real rank */}
-                {showRank && <td className="rank">{m.rank}</td>}
+              <tr
+                key={m.id}
+                className={`row${selected ? " is-selected" : ""}`}
+              >
+                {showRank && (
+                  <td className="rank">{m.rank}</td>
+                )}
+
                 <td>
-                  {/* Logo + name/company layout */}
                   <div className="model-cell">
                     <Avatar company={m.company} />
+
                     <div>
-                      {/* Model name with "Selected" tag if chosen */}
                       <div className="name">
-                        {m.name} {selected && <span className="selected-tag">Selected</span>}
+                        {m.name}{" "}
+                        {selected && (
+                          <span className="selected-tag">
+                            <T>Selected</T>
+                          </span>
+                        )}
                       </div>
-                      {/* Company name */}
-                      <div className="company">{m.company}</div>
+
+                      <div className="company">
+                        {m.company}
+                      </div>
                     </div>
                   </div>
                 </td>
-                {/* Number columns */}
+
                 <td className="r">{fmtInt(m.water)}</td>
                 <td className="r">{fmtInt(m.co2)}</td>
                 <td className="r">{fmtInt(m.energy)}</td>
+
                 <td className="r">
-                  {/* Score text, e.g. 9/12 */}
-                  <span className="score">{m.score}<small>/12</small></span>
-                  {/* Score bar, width = score out of 12 */}
+                  <span className="score">
+                    {m.score}
+                    <small>/12</small>
+                  </span>
+
                   <span className="score-bar" aria-hidden="true">
-                    <i style={{ width: `${(m.score / 12) * 100}%` }} />
+                    <i
+                      style={{
+                        width: `${(m.score / 12) * 100}%`,
+                      }}
+                    />
                   </span>
                 </td>
               </tr>

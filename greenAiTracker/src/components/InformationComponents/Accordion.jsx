@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
+import { T } from "../../context/TranslationContext";
 
 // A click-to-open panel built on the browser's <details> element.
 // Works on its own, or controlled from outside with `open` + `onOpenChange`.
 
-// Again all made by Ai and may be subject to change if we decide its not needed o find another way to do this.
 export default function Accordion({
   summary,
   children,
@@ -28,10 +28,18 @@ export default function Accordion({
       {...rest}
     >
       <summary>
-        {summary}
+        {typeof summary === "string" ? (
+          <T>{summary}</T>
+        ) : (
+          summary
+        )}
+
         <Plus className="icon" />
       </summary>
-      <div className="acc-body">{children}</div>
+
+      <div className="acc-body">
+        {children}
+      </div>
     </details>
   );
 }
