@@ -30,12 +30,12 @@ class ModelSchema(BaseModel):
         from_attributes = True
 
 #list a single model, e.g. /api/v1/models/5
-@router.get("/{modelID : int}", tags=["Models"], response_model=ModelSchema)
-def getModel(modelID: int, db: Session = Depends(database.getDatabase)):
-    model = database.readModel(db, modelID)
-    return model
-
 @router.get("/search", tags=["Models"], response_model=list[ModelSchema])
 def searchModel(Name: str = Query(min_length=2),  db: Session = Depends(database.getDatabase)):
     models = database.searchModel(db, Name)
     return models
+
+@router.get("/{modelID : int}", tags=["Models"], response_model=ModelSchema)
+def getModel(modelID: int, db: Session = Depends(database.getDatabase)):
+    model = database.readModel(db, modelID)
+    return model
