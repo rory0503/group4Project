@@ -1,6 +1,6 @@
 from pwdlib import PasswordHash
 from pydantic import BaseModel
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request, Response
 from sqlalchemy.orm import Session
 from .. import database
 from app.models.user import User
@@ -38,14 +38,15 @@ async def register(
     return {"id": created_user.id, "email": created_user.email}
 
 @router.post("/login", tags=["Users"])
-async def register(
+async def login(
+    request: Request,
+    response: Response,
     payload: RegisterRequest,
-    db: Session = Depends(database.getDatabase)
+    db: Session = Depends(database.getDatabase),
 ):
     normaliseEmail = payload.email.lower()
-    hashedPassword = password_hash.hash(payload.password)
 
-    user = database.readUser(db, payload.email)
+    user = database.readUser(db, normaliseEmail)
 
     if user is None or not password_hash.verify(payload.password, user.password):
         raise HTTPException(
@@ -53,5 +54,17 @@ async def register(
             detail="Invalid email or password"
         )
     else:
-        #TODO: generate session ID
-        return True
+        sessionManager = request.app.state.sessionManager
+        sessionID = sessionManager.createSession(user.id)
+
+        response.set_cookie(
+            key = "sessionID",
+            value = sessionID,
+            httponly = True,
+            secure = True,
+            samesite = "lax",
+            max_age = 86400
+        )
+        
+        response.status_code = status.HTTP_200_OK
+        return response

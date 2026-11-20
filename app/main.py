@@ -5,11 +5,14 @@ from app.databaseConfig import Base, engine
 from contextlib import contextmanager
 from app.database import getDatabase
 from app.routers.views import updateModelsAndProviders
+from app.sessionManager import SessionManager
 
 from app.routers import api_router
 
 PROJECT_NAME = os.getenv("PROJECT_NAME", "AI Environmental Impact Tracker")
 API_V1_STR = "/api/v1"
+
+from app.models import User, CustomModel, Model, Provider
 
 Base.metadata.create_all(bind=engine)
 
@@ -42,11 +45,13 @@ async def root():
         "docs_url": "/docs"
     }
 
+app.state.sessionManager = SessionManager(expiryHours=24)
+
 #on server startup, update data immedietelly
-with contextmanager(getDatabase)() as db:
-    try:
-        updateModelsAndProviders(db)
-        print("Database sync complete.", flush=True)
-    except Exception as e:
-        print(f"Error during sync: {e}", flush=True)
-        db.rollback()
+#with contextmanager(getDatabase)() as db:
+#    try:
+#        updateModelsAndProviders(db)
+#        print("Database sync complete.", flush=True)
+#    except Exception as e:
+#        print(f"Error during sync: {e}", flush=True)
+#        db.rollback()

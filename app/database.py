@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.models.model import Model
 from app.models.provider import Provider
 from app.models.user import User
+from app.models.customModel import CustomModel
 from sqlalchemy import text
 
 #create a database session that closes after use
@@ -79,3 +80,16 @@ def writeUser(db: Session, user: User):
 
 def readUser(db: Session, email: str):
     return db.query(User).filter(User.email == email).first()
+
+def writeCustomModel(db: Session, customModel: CustomModel):
+    db.add(customModel)
+    db.commit()
+
+def readCustomModel(db: Session, customModelID: int):
+    return db.get(CustomModel, customModelID)
+
+def searchCustomModel(db: Session, name: str):
+    return db.query(CustomModel).filter(CustomModel.Name.contains(name, autoescape=True)).order_by(CustomModel.Name).all()
+
+def readCustomModelsByUser(db: Session, userID: int):
+    return db.query(CustomModel).filter(CustomModel.User_ID == userID).all()
