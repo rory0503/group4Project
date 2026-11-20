@@ -33,6 +33,7 @@ class TranslationResponse(BaseModel):
 
 @router.post("/translate", response_model=TranslationResponse)
 async def translate_text(request: TranslationRequest):
+    # Add Project Name
     project_id = os.getenv("GOOGLE_CLOUD_PROJECT")
 
     if request.target_language not in SUPPORTED_LANGUAGES:
