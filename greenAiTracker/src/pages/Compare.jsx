@@ -151,7 +151,7 @@ export default function Compare() {
                     <div className="field">
                       <label className="label" htmlFor="mode">View</label>
                       <select className="select" id="mode" value={mode} onChange={(e) => setMode(e.target.value)}>
-                        <option value="year">Per year</option>
+                        <option value="year">Per 300 Token</option>
                         <option value="cumulative">Cumulative</option>
                       </select>
                     </div>
