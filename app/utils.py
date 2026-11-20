@@ -15,7 +15,7 @@ def compareProvidersAndModels(providersA: list[Provider], providersB: list[Provi
         providerB = next(p for p in providersB if p.Name == providerA.Name)
 
         if Counter(m.Name for m in providerA.Models) != Counter(m.Name for m in providerB.Models):
-            print("Models mismatch in " + providersA.Name)
+            print("Models mismatch in " + providerA.Name)
             return False
 
         for modelA in providerA.Models:
