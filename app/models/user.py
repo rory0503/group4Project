@@ -10,3 +10,4 @@ class User(Base):
     password = Column(String(255), nullable=False)
 
     customModels = relationship("CustomModel", back_populates="User")
+    savedModels = relationship("SavedModel", back_populates="User")

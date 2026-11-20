@@ -4,6 +4,7 @@ from app.models.model import Model
 from app.models.provider import Provider
 from app.models.user import User
 from app.models.customModel import CustomModel
+from app.models.savedModel import SavedModel
 from sqlalchemy import text
 
 #create a database session that closes after use
@@ -93,3 +94,10 @@ def searchCustomModel(db: Session, name: str):
 
 def readCustomModelsByUser(db: Session, userID: int):
     return db.query(CustomModel).filter(CustomModel.User_ID == userID).all()
+
+def writeSavedModel(db: Session, savedModel: SavedModel):
+    db.add(savedModel)
+    db.commit()
+
+def readSavedModelsByUser(db: Session, userID: int):
+    return db.query(SavedModel).filter(SavedModel.User_ID == userID).all()

@@ -48,10 +48,10 @@ async def root():
 app.state.sessionManager = SessionManager(expiryHours=24)
 
 #on server startup, update data immedietelly
-#with contextmanager(getDatabase)() as db:
-#    try:
-#        updateModelsAndProviders(db)
-#        print("Database sync complete.", flush=True)
-#    except Exception as e:
-#        print(f"Error during sync: {e}", flush=True)
-#        db.rollback()
+with contextmanager(getDatabase)() as db:
+    try:
+        updateModelsAndProviders(db)
+        print("Database sync complete.", flush=True)
+    except Exception as e:
+        print(f"Error during sync: {e}", flush=True)
+        db.rollback()
