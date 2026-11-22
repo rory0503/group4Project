@@ -1,30 +1,66 @@
 import { Droplet, Zap, Cloud } from "lucide-react";
-import { compact } from "../../lib/helpers";
+import { average } from "../../lib/helpers";
 
-const ICONS = { droplet: Droplet, zap: Zap, cloud: Cloud };
+import {
+  DEFAULT_TOKEN_SCALE_ID,
+  formatScaledMetric,
+  getTokenScale,
+  scaleMetricValue,
+} from "../../lib/tokenScale";
 
-//single statcard showing a single metric.
-// the models value is formatted for display and the difference from average is calculated.
-export default function StatCard({ meta, model, average }) {
+const ICONS = {
+  droplet: Droplet,
+  zap: Zap,
+  cloud: Cloud,
+};
+
+export default function StatCard({
+  meta,
+  model,
+  average: averageValue,
+  tokenScaleId = DEFAULT_TOKEN_SCALE_ID,
+}) {
   const Icon = ICONS[meta.icon];
-  const v = compact(meta.key, model[meta.key]);
-  const pct = average ? Math.round(((model[meta.key] - average) / average) * 100) : 0;
+  const activeScale = getTokenScale(tokenScaleId);
+
+  const scaledValue = scaleMetricValue(
+    model[meta.key],
+    activeScale.multiplier
+  );
+
+  const pct = averageValue
+    ? Math.round(
+        ((model[meta.key] - averageValue) / averageValue) * 100
+      )
+    : 0;
+
   const good = pct <= 0;
 
   return (
-    //sets the statcads colour and displays information, also gives it green if above average or amber is below average.
     <article className="card stat" style={{ "--c": `var(${meta.color})` }}>
       <div className="stat-top">
         <span className="stat-label">
-          <span className="stat-icon"><Icon className="icon" /></span>
+          <span className="stat-icon">
+            <Icon className="icon" />
+          </span>
           {meta.title}
         </span>
       </div>
-      <p className="stat-value num">{v.value}<small>{v.unit}</small></p>
+
+      <p className="stat-value num">
+        {formatScaledMetric(scaledValue)}
+        <small>{meta.unit}</small>
+      </p>
+
       <div className="stat-top">
-        <p className="stat-scope">Per year · <strong>{model.name}</strong></p>
+        <p className="stat-scope">
+          Per {activeScale.shortLabel} · <strong>{model.name}</strong>
+        </p>
+
         <span className={`badge ${good ? "badge-good" : "badge-warn"}`}>
-          {pct === 0 ? "Average" : `${Math.abs(pct)}% ${good ? "below" : "above"} avg`}
+          {pct === 0
+            ? "Average"
+            : `${Math.abs(pct)}% ${good ? "below" : "above"} avg`}
         </span>
       </div>
     </article>
