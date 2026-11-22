@@ -74,10 +74,30 @@ export default function ModelTable({
 }) {
   const activeScale = getTokenScale(tokenScaleId);
 
+  const averages = {
+  water:
+    models.length > 0
+      ? models.reduce((sum, m) => sum + m.water, 0) / models.length
+      : 0,
+
+  co2:
+    models.length > 0
+      ? models.reduce((sum, m) => sum + m.co2, 0) / models.length
+      : 0,
+
+  energy:
+    models.length > 0
+      ? models.reduce((sum, m) => sum + m.energy, 0) / models.length
+      : 0,
+  };
   const orderedModels = [...models].sort(
     (a, b) => (b.id === selectedId) - (a.id === selectedId)
   );
-
+  const lowestValues = {
+    water: Math.min(...models.map((m) => m.water)),
+    co2: Math.min(...models.map((m) => m.co2)),
+    energy: Math.min(...models.map((m) => m.energy)),
+  };
   return (
     <div className="table-wrap">
       <table className="data-table">
@@ -165,16 +185,46 @@ export default function ModelTable({
                 </td>
 
                 <td className="r">
-                  {formatScaledMetric(water)}
-                </td>
+                {formatScaledMetric(water)}
+                {m.water === lowestValues.water && (
+                  <span className="lowest-impact-badge">
+                    Lowest
+                  </span>
+                )}
+                <span
+    className={`average-indicator ${
+      m.water < averages.water
+        ? "below-average"
+        : m.water > averages.water
+        ? "above-average"
+        : "average-value"
+    }`}
+  >
+    {m.water < averages.water
+      ? "↓ Below average"
+      : m.water > averages.water
+      ? "↑ Above average"
+      : "Average"}
+  </span>
+              </td>
 
                 <td className="r">
-                  {formatScaledMetric(co2)}
-                </td>
+                {formatScaledMetric(co2)}
+                {m.co2 === lowestValues.co2 && (
+                  <span className="lowest-impact-badge">
+                    Lowest
+                  </span>
+                )}
+              </td>
 
                 <td className="r">
-                  {formatScaledMetric(energy)}
-                </td>
+              {formatScaledMetric(energy)}
+              {m.energy === lowestValues.energy && (
+                <span className="lowest-impact-badge">
+                  Lowest
+                </span>
+              )}
+            </td>
 
                 <td className="r">
                   <span className="score">

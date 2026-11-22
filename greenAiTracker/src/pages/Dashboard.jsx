@@ -44,6 +44,15 @@ export default function Dashboard() {
     }));
   }
 
+  function resetFilters() {
+    setSecondId(null);
+    setMetric(profileSettings.metric ?? "water");
+    setMode("year");
+    setRange(profileSettings.range ?? "all");
+    setTokenScaleId(DEFAULT_TOKEN_SCALE_ID);
+    setSort({ key: "score", dir: "desc" });
+  }
+
   // The top 3 models by score, plus the models being viewed, which is displayed at top of table.
   const ids = new Set(sortModels(models, "score", "desc").slice(0, 3).map((m) => m.id));
   if (model) ids.add(model.id);
@@ -66,6 +75,10 @@ export default function Dashboard() {
               <p>The yearly resource footprint of <strong>{model.name}</strong>, and how it compares.</p>
             )}
           </div>
+
+          <button className="btn btn-outline" type="button" onClick={resetFilters}>
+            Reset filters
+          </button>
         </div>
 
         {/* There for when the backend is connected, showing if the data is loading, if there is an error or if there are no models available. */}

@@ -1,5 +1,5 @@
 import { useId } from "react";
-import { Droplet, Zap, Cloud } from "lucide-react";
+import { Droplet, Zap, Cloud, Info } from "lucide-react";
 import { METRICS } from "../lib/helpers";
 
 const ICONS = { droplet: Droplet, zap: Zap, cloud: Cloud };
@@ -25,10 +25,26 @@ export default function MetricPicker({ value, onChange }) {
             />
             <span className="opt">
               <span className="radio"></span>
-              <span className="opt-text">
-                <strong>{m.label}</strong>
-                <span>{m.long}</span>
-              </span>
+             <span className="opt-text">
+              <strong>
+                {m.label}
+                <span
+                  className="metric-info"
+                  title={
+                    m.key === "water"
+                      ? "Estimated water consumption associated with processing a single AI request. Values are estimates and can vary depending on infrastructure and cooling systems."
+                      : m.key === "energy"
+                      ? "Estimated electricity consumed when processing a single AI request. Lower values indicate less estimated energy consumption."
+                      : "Estimated carbon dioxide equivalent emissions associated with processing a single AI request. This estimate can vary depending on electricity sources and infrastructure."
+                  }
+                  aria-label={`Information about ${m.label}`}
+                  role="img"
+                >
+                  <Info size={14} />
+                </span>
+              </strong>
+              <span>{m.long}</span>
+            </span>
               <span className="opt-icon"><Icon className="icon" /></span>
             </span>
           </label>

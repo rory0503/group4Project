@@ -493,3 +493,77 @@ th[aria-sort] .sort-btn .icon { opacity: 1; }
   color: #ffffff;
   font-weight: 600;
 }
+
+.lowest-impact-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 3px 7px;
+  border-radius: 6px;
+  background: #dcfce7;
+  color: #166534;
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.metric-info {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+  color: var(--muted, #888);
+  cursor: help;
+  vertical-align: middle;
+}
+
+.metric-info:hover {
+  color: var(--text, #333);
+}
+
+/* Percentage differences in model comparisons */
+.percentage-difference {
+  display: block;
+  font-size: 0.75rem;
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+.difference-lower {
+  color: #16a34a;
+}
+
+.difference-higher {
+  color: #dc2626;
+}
+
+.difference-same {
+  color: var(--muted, #888);
+}
+
+.comparison-baseline {
+  display: block;
+  font-size: 0.75rem;
+  margin-top: 4px;
+  color: var(--muted, #888);
+}
+
+/* Average comparison indicators */
+.average-indicator {
+  display: block;
+  font-size: 0.7rem;
+  margin-top: 4px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.below-average {
+  color: #16a34a;
+}
+
+.above-average {
+  color: #dc2626;
+}
+
+.average-value {
+  color: var(--muted, #888);
+}

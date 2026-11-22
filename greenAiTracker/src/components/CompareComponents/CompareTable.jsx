@@ -9,6 +9,19 @@ import {
 
 const MAX_MODELS = 3;
 
+
+function percentageDifference(value, baseline) {
+  if (baseline === 0) return null;
+
+  const difference = ((value - baseline) / Math.abs(baseline)) * 100;
+
+  if (difference === 0) return "Same";
+
+  return `${Math.abs(difference).toFixed(1)}% ${
+    difference > 0 ? "higher" : "lower"
+  }`;
+}
+
 const ROWS = [
   { label: "Water", key: "water", best: "min", scalable: true },
   { label: "Energy", key: "energy", best: "min", scalable: true },
@@ -121,8 +134,7 @@ export default function CompareTable({
                 </th>
 
                 {models.map((m, i) => {
-                  const isBest =
-                    hasWinner && values[i] === target;
+                  const isBest = hasWinner && values[i] === target;
 
                   const displayValue = row.scalable
                     ? `${formatScaledMetric(values[i])} ${
@@ -130,12 +142,37 @@ export default function CompareTable({
                       } ${activeScale.unitSuffix}`
                     : row.format(m, total);
 
+                  const difference =
+                    row.scalable && i > 0 && values[i] !== null
+                      ? percentageDifference(values[i], values[0])
+                      : null;
+
                   return (
                     <td
                       className={`num${isBest ? " best" : ""}`}
                       key={m.id}
                     >
                       {displayValue}
+
+                      {row.scalable && i === 0 && (
+                        <span className="comparison-baseline">
+                          Baseline
+                        </span>
+                      )}
+
+                      {difference && (
+                        <span
+                          className={`percentage-difference ${
+                            difference.includes("lower")
+                              ? "difference-lower"
+                              : difference.includes("higher")
+                              ? "difference-higher"
+                              : "difference-same"
+                          }`}
+                        >
+                          {difference}
+                        </span>
+                      )}
 
                       {isBest && (
                         <span className="best-tag">Best</span>
