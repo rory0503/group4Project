@@ -37,7 +37,7 @@ def _midpoint(impacts, key):
 
 
 #impact estimate for one model, as a Model object the values are power kWh, co2 kgCO2eq, water in litres
-def get_model_data(provider, model, output_token_count=300, electricity_mix_zone="WOR"):
+def get_model_data(provider, model, output_token_count=1000, electricity_mix_zone="WOR"):
     headers = {
         "accept": "application/json",
         "Content-Type": "application/json"
