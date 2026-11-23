@@ -1,26 +1,41 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import useLocalStorage from "./useLocalStorage";
+import { isPopular } from "../lib/popular";
 
 // Gets every model from the backend and turns it into the shape the pages use.
-// Still returns { models, loading, error } so nothing else has to change.
+// Returns { models, allModels, loading, error, showAll, setShowAll }:
+//   models    = what the pages show (popular models only, unless "show all" is on)
+//   allModels = every model in the database (use this to look up a saved favourite by id)
 const API = "/api/v1";
 
 export default function useModels() {
-  const [models, setModels] = useState([]);
+  const [allModels, setAllModels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  // Remembered between visits, like the other settings
+  const [showAll, setShowAll] = useLocalStorage("show-all", false);
 
   useEffect(() => {
     let cancelled = false; // stops updates if the page is closed before the data arrives
 
     loadModels()
-      .then((list) => { if (!cancelled) setModels(list); })
+      .then((list) => { if (!cancelled) setAllModels(list); })
       .catch((err) => { if (!cancelled) setError(err); })
       .finally(() => { if (!cancelled) setLoading(false); });
 
     return () => { cancelled = true; };
   }, []);
 
-  return { models, loading, error };
+  // The list the pages use. Scores come from the full list, so they never change when the filter does.
+  const models = useMemo(() => {
+    if (showAll) return allModels;
+    const popular = allModels.filter(isPopular);
+    if (popular.length === 0) return allModels; // if no names match, show everything rather than an empty site
+    // Rank again among the models shown (1, 2, 3...) so the table has no gaps
+    return popular.map((m, i) => ({ ...m, rank: i + 1 }));
+  }, [allModels, showAll]);
+
+  return { models, allModels, loading, error, showAll, setShowAll };
 }
 
 async function getJson(url) {

@@ -451,3 +451,4 @@ th[aria-sort] .sort-btn .icon { opacity: 1; }
  
 #root { flex: 1; display: flex; flex-direction: column; }
  
+.model-filter { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }

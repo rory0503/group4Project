@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Info, Download, ArrowRight, X } from "lucide-react";
 import useLocalStorage from "../hooks/useLocalStorage";
 import useModels from "../hooks/useModels";
+import ModelFilterToggle from "../components/ModelFilterToggle";
 import { byId, sortModels } from "../lib/helpers";
 import exportCsv from "../lib/exportCsv";
 import ModelPicker from "../components/ModelPicker";
@@ -10,7 +11,7 @@ import CycleModelTable from "../components/RankingsComponents/cycleRankings.jsx"
 import "../styles/rankings.css";
 
 export default function Rankings() {
-  const { models, loading, error } = useModels();
+  const { models, allModels, showAll, setShowAll, loading, error } = useModels();
   const [primaryId, setPrimaryId] = useLocalStorage("selected", "");
   const [secondId, setSecondId] = useState(null);
   const [metric, setMetric] = useState("water");
@@ -43,6 +44,7 @@ export default function Rankings() {
         {model && (
           <>
             <section className="section" aria-labelledby="table-title">
+              <ModelFilterToggle showAll={showAll} setShowAll={setShowAll} shown={models.length} total={allModels.length} />
               <div className="section-head">
                 {/* Search bar for model */}
                 <ModelPicker

@@ -21,7 +21,8 @@ export default function ModelPicker({
   const options = models.filter(
     (m) =>
       !exclude.includes(m.id) &&
-      (!query || m.name.includes(query) || m.company.toLowerCase().includes(query))
+      // both sides are lower case, so "gpt" finds "GPT-4" (before, capital letters in names were never matched)
+      (!query || m.name.toLowerCase().includes(query) || m.company.toLowerCase().includes(query))
   );
 
   function choose(id) {

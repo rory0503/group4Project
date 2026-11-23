@@ -157,3 +157,22 @@
 thead .muted-col {
   color: rgba(255, 255, 255, 0.6) !important;
 }
+
+/* The plus in an empty Compare slot is now a button. It looks the same as before; it just shows a hand cursor,
+   a soft outline on hover, and the usual focus ring for keyboard users. */
+.slot-add-btn {
+  all: unset; /* start from nothing so the plus square keeps its existing look */
+  align-self: flex-start;
+  justify-self: start;
+  display: inline-flex;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.slot-add-btn:hover .slot-add-icon {
+  box-shadow: 0 0 0 2px var(--border-strong);
+}
+
+.slot-add-btn:focus-visible {
+  box-shadow: var(--ring);
+}

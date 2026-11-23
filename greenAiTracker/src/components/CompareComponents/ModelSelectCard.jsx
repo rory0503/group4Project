@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { X, Plus } from "lucide-react";
 import ModelPicker from "../ModelPicker";
 import { byId } from "../../lib/helpers";
@@ -11,14 +12,24 @@ export default function ModelSelectCard({ slot, models, value, onChange, exclude
   const model = byId(models, value);
   // --c drives the coloured top border and dot (green / blue / orange)
   const slotColor = { "--c": `var(--slot-${slot})` };
+  // Points at the card, so the plus button can find the search box inside it
+  const cardRef = useRef(null);
 
   // Empty slot: dashed card with a plus icon
   if (!model) {
     return (
-      <article className="card slot slot-empty" style={slotColor}>
-        <span className="slot-add-icon" aria-hidden="true">
-          <Plus className="icon" />
-        </span>
+      <article className="card slot slot-empty" style={slotColor} ref={cardRef}>
+        {/* The plus is a button: clicking it jumps to the search box below and opens the list of models */}
+        <button
+          type="button"
+          className="slot-add-btn"
+          aria-label={`Search for a ${ORDINAL[slot - 1]} model to add`}
+          onClick={() => cardRef.current?.querySelector("input")?.focus()}
+        >
+          <span className="slot-add-icon" aria-hidden="true">
+            <Plus className="icon" />
+          </span>
+        </button>
         {/* add a first/scond/third model text */}
         <div>
           <div className="name">Add a {ORDINAL[slot - 1]} model</div>
