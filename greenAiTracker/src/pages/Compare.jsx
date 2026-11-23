@@ -1,40 +1,48 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Link2, Download } from "lucide-react";
 import useModels from "../hooks/useModels";
 import useLocalStorage from "../hooks/useLocalStorage";
 import { METRICS, byId } from "../lib/helpers";
 import exportCsv from "../lib/exportCsv";
+import { DEFAULT_TOKEN_SCALE_ID, TOKEN_SCALES, getTokenScale } from "../lib/tokenScale";
 import MetricPicker from "../components/MetricPicker";
 import ModelSelectCard from "../components/CompareComponents/ModelSelectCard";
 import InsightCards from "../components/CompareComponents/InsightCards";
 import CompareTable from "../components/CompareComponents/CompareTable";
+import TrendChart from "../components/TrendChart";
+import useFavourites, { favouritesFirst } from "../hooks/useFavourites";
 import "../styles/compare.css";
 
 // The most models that can be compared at once
 const MAX_MODELS = 3;
 
 export default function Compare() {
-  // All models, plus loading/error states (for when the backend is connected)
+  // All models, plus loading/error states
   const { models, loading, error } = useModels();
   const [searchParams] = useSearchParams();
   // The model last viewed on the Dashboard (used as a starting choice)
   const [dashboardId] = useLocalStorage("selected", "");
-  // the defaults saved on the Profile page (default metric and time range)
+  // The defaults saved on the Profile page (default metric and time range)
   const [profileSettings] = useLocalStorage("profile-settings", {});
 
   // The chosen models IDs (1–3). Starts from a shared link (?models=a,b,c) if there is one.
   const [ids, setIds] = useState(() =>
     (searchParams.get("models") || "").split(",").filter(Boolean).slice(0, MAX_MODELS)
   );
-  // Chart settings (the chart itself isn't built yet). They start on the defaults saved on the Profile page.
-  const [metric, setMetric] = useState(profileSettings.metric ?? "water"); // 
+  // Chart settings. They start on the defaults saved on the Profile page.
+  const [metric, setMetric] = useState(profileSettings.metric ?? "water");
   const [mode, setMode] = useState("year");
-  const [range, setRange] = useState(profileSettings.range ?? "all"); // 
+  const [range, setRange] = useState(profileSettings.range ?? "all");
+  const [tokenScaleId, setTokenScaleId] = useState(DEFAULT_TOKEN_SCALE_ID);
   const [linkStatus, setLinkStatus] = useState(null); // null | "copied" | "failed"
 
-  // Details of the selected metric (title, axis label)
+  // Details of the selected metric (title) and active token scale
   const meta = METRICS[metric];
+  const activeScale = useMemo(() => getTokenScale(tokenScaleId), [tokenScaleId]);
+
+  const [favourites] = useFavourites();
+  const pickerModels = favouritesFirst(models, favourites);
 
   // Once the models have loaded: drop any unknown ids from the link, and if nothing is
   // left start with the dashboard model plus the top-ranked one.
@@ -59,6 +67,9 @@ export default function Compare() {
 
   // Turn the chosen ids into full model objects
   const chosen = ids.map((id) => byId(models, id)).filter(Boolean);
+
+  // The lines on the chart: one per chosen model (slot 0, 1 and 2 pick the line colours)
+  const chartItems = chosen.map((model, i) => ({ model, slot: i }));
 
   // Picking a model replaces that slot; clearing it (null) removes the slot
   function changeSlot(index, newId) {
@@ -104,7 +115,7 @@ export default function Compare() {
           </button>
         </div>
 
-        {/* Loading and error messages (for when the backend is connected) */}
+        {/* Loading and error messages */}
         {loading && <p className="card">Loading model data…</p>}
         {error && <div className="notice">We couldn't load the model data. Try again in a moment.</div>}
 
@@ -116,7 +127,7 @@ export default function Compare() {
                 <ModelSelectCard
                   key={model.id}
                   slot={i + 1}
-                  models={models}
+                  models={pickerModels}
                   value={model.id}
                   onChange={(newId) => changeSlot(i, newId)}
                   exclude={ids.filter((_, j) => j !== i)}
@@ -126,7 +137,7 @@ export default function Compare() {
                 <ModelSelectCard
                   key="new"
                   slot={chosen.length + 1}
-                  models={models}
+                  models={pickerModels}
                   value={null}
                   onChange={addModel}
                   exclude={ids}
@@ -137,9 +148,24 @@ export default function Compare() {
             {/* Everything below only shows once at least one model is chosen */}
             {chosen.length > 0 && (
               <>
-                {/* Chart section: dropdowns, chart placeholder and metric picker */}
+                {/* Chart section: dropdowns, the line chart and the metric picker */}
                 <section className="section" aria-labelledby="trend-title">
-                  <div className="toolbar" style={{ gridTemplateColumns: "repeat(2, minmax(0, 220px))" }}>
+                  <div className="toolbar" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(180px, 220px))" }}>
+                    <div className="field">
+                      <label className="label" htmlFor="token-scale">Token scale</label>
+                      <select
+                        className="select"
+                        id="token-scale"
+                        value={tokenScaleId}
+                        onChange={(e) => setTokenScaleId(e.target.value)}
+                      >
+                        {TOKEN_SCALES.map((scale) => (
+                          <option key={scale.id} value={scale.id}>
+                            {scale.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                     <div className="field">
                       <label className="label" htmlFor="mode">View</label>
                       <select className="select" id="mode" value={mode} onChange={(e) => setMode(e.target.value)}>
@@ -161,20 +187,16 @@ export default function Compare() {
                     <div className="card chart-card">
                       <div className="chart-head">
                         <h2 id="trend-title">{meta.title} over time</h2>
-                        <span className="chart-unit">{meta.title} ({meta.axis})</span>
+                        <span className="hint">{activeScale.label}</span>
                       </div>
-                      {/* Coloured key for each model */}
-                      <div className="legend">
-                        {chosen.map((m, i) => (
-                          <span className="legend-item" key={m.id}>
-                            <span className="legend-line" style={{ "--c": `var(--slot-${i + 1})` }} />
-                            {m.name}
-                          </span>
-                        ))}
-                      </div>
-                      <div className="chart-box">
-                        <p className="card-sub">The chart will go here.</p>
-                      </div>
+                      {/* the line chart, with its own coloured key (legend) and axis labels */}
+                      <TrendChart
+                        items={chartItems}
+                        metric={metric}
+                        mode={mode}
+                        range={range}
+                        tokenScaleId={tokenScaleId}
+                      />
                     </div>
 
                     <div className="card">
@@ -193,14 +215,28 @@ export default function Compare() {
                     <button
                       className="btn btn-outline"
                       type="button"
-                      onClick={() => exportCsv(chosen, "green-ai-tracker-comparison.csv")}
+                      onClick={() =>
+                        exportCsv(
+                          chosen,
+                          "green-ai-tracker-comparison.csv",
+                          tokenScaleId
+                        )
+                      }
                     >
                       <Download className="icon icon-sm" />Export comparison
                     </button>
                   </div>
 
-                  <InsightCards models={chosen} />
-                  <CompareTable models={chosen} total={models.length} />
+                  <InsightCards
+                      models={chosen}
+                      tokenScaleId={tokenScaleId}
+                    />
+
+                    <CompareTable
+                      models={chosen}
+                      total={models.length}
+                      tokenScaleId={tokenScaleId}
+                    />
                 </section>
               </>
             )}
