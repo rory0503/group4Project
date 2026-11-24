@@ -10,7 +10,7 @@ const ROWS = [
   { label: "Water", key: "water", best: "min", format: withUnit("water") },
   { label: "Energy", key: "energy", best: "min", format: withUnit("energy") },
   { label: "CO₂", key: "co2", best: "min", format: withUnit("co2") },
-  { label: "Score", key: "score", best: "max", format: (m) => `${m.score}/30` },
+  { label: "Score", key: "score", best: "max", format: (m) => `${m.score}/12` },
   { label: "Rank", key: "rank", best: "min", format: (m, total) => `#${m.rank} of ${total}` },
   { label: "Projected growth", key: "proj", best: "min", format: (m) => `+${Math.round((m.proj - 1) * 100)}% / yr` },
   { label: "Release year", key: "release", format: (m) => m.release },
