@@ -1,69 +1,189 @@
-import { METRICS, fmtInt } from "../../lib/helpers";
+import { METRICS } from "../../lib/helpers";
+
+import {
+  DEFAULT_TOKEN_SCALE_ID,
+  formatScaledMetric,
+  getTokenScale,
+  scaleMetricValue,
+} from "../../lib/tokenScale";
 
 const MAX_MODELS = 3;
 
-// Formats a number with its unit, e.g. 41,8000,000 L
-const withUnit = (key) => (m) => `${fmtInt(m[key])} ${METRICS[key].unit}`;
 
-// best: "min" = lowest value wins, "max" = highest wins, undefined = nothing to highlight
+function percentageDifference(value, baseline) {
+  if (baseline === 0) return null;
+
+  const difference = ((value - baseline) / Math.abs(baseline)) * 100;
+
+  if (difference === 0) return "Same";
+
+  return `${Math.abs(difference).toFixed(1)}% ${
+    difference > 0 ? "higher" : "lower"
+  }`;
+}
+
 const ROWS = [
-  { label: "Water", key: "water", best: "min", format: withUnit("water") },
-  { label: "Energy", key: "energy", best: "min", format: withUnit("energy") },
-  { label: "CO₂", key: "co2", best: "min", format: withUnit("co2") },
-  { label: "Score", key: "score", best: "max", format: (m) => `${m.score}/12` },
-  { label: "Rank", key: "rank", best: "min", format: (m, total) => `#${m.rank} of ${total}` },
-  { label: "Projected growth", key: "proj", best: "min", format: (m) => `+${Math.round((m.proj - 1) * 100)}% / yr` },
-  { label: "Release year", key: "release", format: (m) => m.release },
-  { label: "Company", key: "company", format: (m) => m.company },
+  { label: "Water", key: "water", best: "min", scalable: true },
+  { label: "Energy", key: "energy", best: "min", scalable: true },
+  { label: "CO₂", key: "co2", best: "min", scalable: true },
+
+  {
+    label: "Score",
+    key: "score",
+    best: "max",
+    format: (m) => `${m.score}/12`,
+  },
+  {
+    label: "Rank",
+    key: "rank",
+    best: "min",
+    format: (m, total) => `#${m.rank} of ${total}`,
+  },
+  {
+    label: "Projected growth",
+    key: "proj",
+    best: "min",
+    format: (m) => `+${Math.round((m.proj - 1) * 100)}% / yr`,
+  },
+  {
+    label: "Release year",
+    key: "release",
+    format: (m) => m.release ?? "—",
+  },
+  {
+    label: "Company",
+    key: "company",
+    format: (m) => m.company,
+  },
 ];
 
-// Side by side table comparing the chosen models
-export default function CompareTable({ models, total }) {
-    //Adds a greyed out column when less than 3 models are chosen
+export default function CompareTable({
+  models,
+  total,
+  tokenScaleId = DEFAULT_TOKEN_SCALE_ID,
+}) {
+  const activeScale = getTokenScale(tokenScaleId);
   const hasEmptyColumn = models.length < MAX_MODELS;
 
   return (
     <div className="table-wrap">
       <table className="data-table compare-table">
-        <caption className="sr-only">Metric-by-metric comparison of the selected models</caption>
+        <caption className="sr-only">
+          Model comparison. Environmental measurements are shown per{" "}
+          {activeScale.shortLabel}.
+        </caption>
+
         <thead>
           <tr>
             <th scope="col">Metric</th>
-            {/*one column per model, with its slot colour dot*/}
+
             {models.map((m, i) => (
               <th scope="col" key={m.id}>
                 <span className="th-model">
-                  <span className="slot-dot" style={{ "--c": `var(--slot-${i + 1})` }} />
+                  <span
+                    className="slot-dot"
+                    style={{ "--c": `var(--slot-${i + 1})` }}
+                  />
                   {m.name}
                 </span>
               </th>
             ))}
-            {hasEmptyColumn && <th scope="col" className="muted-col">No model selected</th>}
+
+            {hasEmptyColumn && (
+              <th scope="col" className="muted-col">
+                No model selected
+              </th>
+            )}
           </tr>
         </thead>
+
         <tbody>
-            {/*One table row per entry is ROWS */}
           {ROWS.map((row) => {
-            // Each models value for this row, and which value is the best
-            const values = models.map((m) => m[row.key]);                                                                     
-            const target = row.best === "min" ? Math.min(...values) : row.best === "max" ? Math.max(...values) : null;
-            // only highlight when exactly one model has the best value
-            const hasWinner = models.length > 1 && row.best && values.filter((v) => v === target).length === 1;
+            const values = models.map((m) =>
+              row.scalable
+                ? scaleMetricValue(m[row.key], activeScale.multiplier)
+                : m[row.key]
+            );
+
+            const validValues = values.filter(
+              (value) => value !== null && Number.isFinite(value)
+            );
+
+            let target = null;
+
+            if (row.best === "min" && validValues.length > 0) {
+              target = Math.min(...validValues);
+            }
+
+            if (row.best === "max" && validValues.length > 0) {
+              target = Math.max(...validValues);
+            }
+
+            const hasWinner =
+              models.length > 1 &&
+              row.best &&
+              validValues.length === models.length &&
+              values.filter((value) => value === target).length === 1;
 
             return (
               <tr className="row" key={row.key}>
-                <th scope="row">{row.label}</th>
-                {/*One cell per model; the iwnner gets a green "Best" highlight*/}
-                {models.map((m) => {
-                  const isBest = hasWinner && m[row.key] === target;
+                <th scope="row">
+                  {row.scalable
+                    ? `${row.label} (${activeScale.shortLabel})`
+                    : row.label}
+                </th>
+
+                {models.map((m, i) => {
+                  const isBest = hasWinner && values[i] === target;
+
+                  const displayValue = row.scalable
+                    ? `${formatScaledMetric(values[i])} ${
+                        METRICS[row.key].unit
+                      } ${activeScale.unitSuffix}`
+                    : row.format(m, total);
+
+                  const difference =
+                    row.scalable && i > 0 && values[i] !== null
+                      ? percentageDifference(values[i], values[0])
+                      : null;
+
                   return (
-                    <td className={`num${isBest ? " best" : ""}`} key={m.id}>
-                      {row.format(m, total)}
-                      {isBest && <span className="best-tag">Best</span>}
+                    <td
+                      className={`num${isBest ? " best" : ""}`}
+                      key={m.id}
+                    >
+                      {displayValue}
+
+                      {row.scalable && i === 0 && (
+                        <span className="comparison-baseline">
+                          Baseline
+                        </span>
+                      )}
+
+                      {difference && (
+                        <span
+                          className={`percentage-difference ${
+                            difference.includes("lower")
+                              ? "difference-lower"
+                              : difference.includes("higher")
+                              ? "difference-higher"
+                              : "difference-same"
+                          }`}
+                        >
+                          {difference}
+                        </span>
+                      )}
+
+                      {isBest && (
+                        <span className="best-tag">Best</span>
+                      )}
                     </td>
                   );
                 })}
-                {hasEmptyColumn && <td className="muted-col">—</td>}
+
+                {hasEmptyColumn && (
+                  <td className="muted-col">—</td>
+                )}
               </tr>
             );
           })}

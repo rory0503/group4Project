@@ -4,7 +4,7 @@ import { years, currentYear } from "../data/models";
 export const METRICS = {
   water: { key: "water", label: "Water", long: "Millilitres per request (mL)", unit: "mL", icon: "droplet", color: "--water", axis: "mL per request", scale: 1, title: "Water usage" },
   energy: { key: "energy", label: "Energy", long: "Watt-hours per request (Wh)", unit: "Wh", icon: "zap", color: "--energy", axis: "Wh per request", scale: 1, title: "Energy usage" },
-  co2: { key: "co2", label: "CO₂", long: "Grams per request (g)", unit: "g", icon: "cloud", color: "--co2", axis: "g per request", scale: 1, title: "CO₂ emissions" },
+  co2: {key: "co2",label: "CO₂",long: "Grams of CO₂ equivalent per request (g CO₂e)",unit: "g CO₂e",icon: "cloud",color: "--co2",axis: "g CO₂e",scale: 1,title: "CO₂ emissions",},
 };
 
 // Number formatting. Keeps 3 significant figures so small values like 0.0042 don't show as 0

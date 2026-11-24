@@ -1,4 +1,6 @@
+import { useState } from "react";
 import LoginSignup from "../components/LoginComponents/LoginSignUpField";
+import ForgotPassword from "../components/LoginComponents/ForgotPassword";
 import LoginSummaryCard from "../components/LoginComponents/WebsiteSummary";
 import "../styles/login.css";
 import { useNavigate } from "react-router-dom";
@@ -7,6 +9,7 @@ import { useAuth } from "../context/AuthContext";
 export default function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const [forgot, setForgot] = useState(false);
 
   return (
     <main id="main" className="page">
@@ -19,16 +22,18 @@ export default function Login() {
         {/*cards side by side*/}
         <div className="auth">
           <LoginSummaryCard />
-          <LoginSignup
-            onLogin={(user, remember) => {
-              login(user, remember);
-              navigate("/profile");
-            }}
-
-          onGoogleSignIn={() => { }}      // optional
-          onForgotPassword={() => { }}  
-          
-          />
+          {forgot ? (
+            <ForgotPassword onBack={() => setForgot(false)} />
+          ) : (
+            <LoginSignup
+              onLogin={(user, remember) => {
+                login(user, remember);
+                navigate("/profile");
+              }}
+              onGoogleSignIn={() => { }}      // optional
+              onForgotPassword={() => setForgot(true)}
+            />
+          )}
         </div>
       </div>
     </main>

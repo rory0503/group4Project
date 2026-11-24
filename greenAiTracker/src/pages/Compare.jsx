@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Link2, Download } from "lucide-react";
 import useModels from "../hooks/useModels";
 import useLocalStorage from "../hooks/useLocalStorage";
 import { METRICS, byId } from "../lib/helpers";
 import exportCsv from "../lib/exportCsv";
+import { DEFAULT_TOKEN_SCALE_ID, TOKEN_SCALES, getTokenScale } from "../lib/tokenScale";
 import MetricPicker from "../components/MetricPicker";
 import ModelSelectCard from "../components/CompareComponents/ModelSelectCard";
 import InsightCards from "../components/CompareComponents/InsightCards";
@@ -33,10 +34,12 @@ export default function Compare() {
   const [metric, setMetric] = useState(profileSettings.metric ?? "water");
   const [mode, setMode] = useState("year");
   const [range, setRange] = useState(profileSettings.range ?? "all");
+  const [tokenScaleId, setTokenScaleId] = useState(DEFAULT_TOKEN_SCALE_ID);
   const [linkStatus, setLinkStatus] = useState(null); // null | "copied" | "failed"
 
-  // Details of the selected metric (title)
+  // Details of the selected metric (title) and active token scale
   const meta = METRICS[metric];
+  const activeScale = useMemo(() => getTokenScale(tokenScaleId), [tokenScaleId]);
 
   const [favourites] = useFavourites();
   const pickerModels = favouritesFirst(models, favourites);
@@ -147,11 +150,26 @@ export default function Compare() {
               <>
                 {/* Chart section: dropdowns, the line chart and the metric picker */}
                 <section className="section" aria-labelledby="trend-title">
-                  <div className="toolbar" style={{ gridTemplateColumns: "repeat(2, minmax(0, 220px))" }}>
+                  <div className="toolbar" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(180px, 220px))" }}>
+                    <div className="field">
+                      <label className="label" htmlFor="token-scale">Token scale</label>
+                      <select
+                        className="select"
+                        id="token-scale"
+                        value={tokenScaleId}
+                        onChange={(e) => setTokenScaleId(e.target.value)}
+                      >
+                        {TOKEN_SCALES.map((scale) => (
+                          <option key={scale.id} value={scale.id}>
+                            {scale.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                     <div className="field">
                       <label className="label" htmlFor="mode">View</label>
                       <select className="select" id="mode" value={mode} onChange={(e) => setMode(e.target.value)}>
-                        <option value="year">Per 300 Token</option>
+                        <option value="year">Per year</option>
                         <option value="cumulative">Cumulative</option>
                       </select>
                     </div>
@@ -169,9 +187,16 @@ export default function Compare() {
                     <div className="card chart-card">
                       <div className="chart-head">
                         <h2 id="trend-title">{meta.title} over time</h2>
+                        <span className="hint">{activeScale.label}</span>
                       </div>
                       {/* the line chart, with its own coloured key (legend) and axis labels */}
-                      <TrendChart items={chartItems} metric={metric} mode={mode} range={range} />
+                      <TrendChart
+                        items={chartItems}
+                        metric={metric}
+                        mode={mode}
+                        range={range}
+                        tokenScaleId={tokenScaleId}
+                      />
                     </div>
 
                     <div className="card">
@@ -190,14 +215,28 @@ export default function Compare() {
                     <button
                       className="btn btn-outline"
                       type="button"
-                      onClick={() => exportCsv(chosen, "green-ai-tracker-comparison.csv")}
+                      onClick={() =>
+                        exportCsv(
+                          chosen,
+                          "green-ai-tracker-comparison.csv",
+                          tokenScaleId
+                        )
+                      }
                     >
                       <Download className="icon icon-sm" />Export comparison
                     </button>
                   </div>
 
-                  <InsightCards models={chosen} />
-                  <CompareTable models={chosen} total={models.length} />
+                  <InsightCards
+                      models={chosen}
+                      tokenScaleId={tokenScaleId}
+                    />
+
+                    <CompareTable
+                      models={chosen}
+                      total={models.length}
+                      tokenScaleId={tokenScaleId}
+                    />
                 </section>
               </>
             )}

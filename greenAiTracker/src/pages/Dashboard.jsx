@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Download, ArrowRight, X } from "lucide-react";
 import useLocalStorage from "../hooks/useLocalStorage";
@@ -6,6 +6,7 @@ import useModels from "../hooks/useModels";
 import { tips } from "../data/models";
 import { METRICS, byId, average, sortModels } from "../lib/helpers";
 import exportCsv from "../lib/exportCsv";
+import { DEFAULT_TOKEN_SCALE_ID, TOKEN_SCALES, getTokenScale } from "../lib/tokenScale";
 import StatCard from "../components/DashboardComponents/StatCard";
 import TipsElement from "../components/DashboardComponents/TipsElement";
 import MetricPicker from "../components/MetricPicker";
@@ -24,6 +25,7 @@ export default function Dashboard() {
   const [metric, setMetric] = useState(profileSettings.metric ?? "water");
   const [mode, setMode] = useState("year");
   const [range, setRange] = useState(profileSettings.range ?? "all");
+  const [tokenScaleId, setTokenScaleId] = useState(DEFAULT_TOKEN_SCALE_ID);
   const [sort, setSort] = useState({ key: "score", dir: "desc" });
   const [favourites] = useFavourites();
   const pickerModels = favouritesFirst(models, favourites);
@@ -31,6 +33,7 @@ export default function Dashboard() {
   // find model by id or default to first model
   const model = byId(models, primaryId) ?? models[0];
   const meta = METRICS[metric];
+  const activeScale = useMemo(() => getTokenScale(tokenScaleId), [tokenScaleId]);
 
   // Clicking the same heading flips the direction; a new heading starts ascending
   // (the score starts highest first).
@@ -39,6 +42,15 @@ export default function Dashboard() {
       key,
       dir: s.key === key ? (s.dir === "asc" ? "desc" : "asc") : key === "score" ? "desc" : "asc",
     }));
+  }
+
+  function resetFilters() {
+    setSecondId(null);
+    setMetric(profileSettings.metric ?? "water");
+    setMode("year");
+    setRange(profileSettings.range ?? "all");
+    setTokenScaleId(DEFAULT_TOKEN_SCALE_ID);
+    setSort({ key: "score", dir: "desc" });
   }
 
   // The top 3 models by score, plus the models being viewed, which is displayed at top of table.
@@ -52,7 +64,7 @@ export default function Dashboard() {
   const second = secondId ? byId(models, secondId) : null;
   const chartItems = [{ model, slot: 0 }, ...(second ? [{ model: second, slot: 1 }] : [])];
 
-  //message at top of page containing chosen models name.
+  // message at top of page containing chosen models name.
   return (
     <main id="main" className="page">
       <div className="container">
@@ -63,6 +75,10 @@ export default function Dashboard() {
               <p>The yearly resource footprint of <strong>{model.name}</strong>, and how it compares.</p>
             )}
           </div>
+
+          <button className="btn btn-outline" type="button" onClick={resetFilters}>
+            Reset filters
+          </button>
         </div>
 
         {/* There for when the backend is connected, showing if the data is loading, if there is an error or if there are no models available. */}
@@ -76,9 +92,16 @@ export default function Dashboard() {
             {/* statcards for each metric of model. */}
             <section className="stats" aria-label="Key figures">
               {Object.values(METRICS).map((m) => (
-                <StatCard key={m.key} meta={m} model={model} average={average(models, m.key)} />
+                <StatCard
+                  key={m.key}
+                  meta={m}
+                  model={model}
+                  average={average(models, m.key)}
+                  tokenScaleId={tokenScaleId}
+                />
               ))}
             </section>
+
             {/* model picker. */}
             <section className="section" aria-labelledby="trend-title">
               <div className="toolbar">
@@ -92,6 +115,7 @@ export default function Dashboard() {
                     exclude={secondId ? [secondId] : []}
                   />
                 </div>
+
                 {/* model picker for comparison. */}
                 <div className="field">
                   <span className="label">Compare with <span className="hint">(optional)</span></span>
@@ -118,14 +142,33 @@ export default function Dashboard() {
                     )}
                   </div>
                 </div>
+
+                {/* token scale filter for the graph (per token, per 1k tokens, etc.) */}
+                <div className="field">
+                  <label className="label" htmlFor="token-scale">Token scale</label>
+                  <select
+                    className="select"
+                    id="token-scale"
+                    value={tokenScaleId}
+                    onChange={(e) => setTokenScaleId(e.target.value)}
+                  >
+                    {TOKEN_SCALES.map((scale) => (
+                      <option key={scale.id} value={scale.id}>
+                        {scale.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
                 {/* change view of the chart to be per year or cumulative. */}
                 <div className="field">
                   <label className="label" htmlFor="mode">View</label>
                   <select className="select" id="mode" value={mode} onChange={(e) => setMode(e.target.value)}>
-                    <option value="year">Per 1000 Token</option>
+                    <option value="year">Per year</option>
                     <option value="cumulative">Cumulative</option>
                   </select>
                 </div>
+
                 {/* time range for graph. */}
                 <div className="field">
                   <label className="label" htmlFor="range">Time range</label>
@@ -141,9 +184,16 @@ export default function Dashboard() {
                 <div className="card chart-card">
                   <div className="chart-head">
                     <h2 id="trend-title">{meta.title} over time</h2>
+                    <span className="hint">{activeScale.label}</span>
                   </div>
                   {/* the line chart, with its own key (legend) and axis labels */}
-                  <TrendChart items={chartItems} metric={metric} mode={mode} range={range} />
+                  <TrendChart
+                    items={chartItems}
+                    metric={metric}
+                    mode={mode}
+                    range={range}
+                    tokenScaleId={tokenScaleId}
+                  />
                 </div>
 
                 <div className="card">
@@ -151,6 +201,7 @@ export default function Dashboard() {
                 </div>
               </div>
             </section>
+
             {/* table info. */}
             <section className="section" aria-labelledby="table-title">
               <div className="section-head">
@@ -159,7 +210,7 @@ export default function Dashboard() {
                   <p>Top 3 models by sustainability score, plus the model you're viewing.</p>
                 </div>
                 {/* export data button. */}
-                <button className="btn btn-outline" type="button" onClick={() => exportCsv(models)}>
+                <button className="btn btn-outline" type="button" onClick={() => exportCsv( models, "green-ai-tracker-models.csv", tokenScaleId)}>
                   <Download className="icon icon-sm" />Export data
                 </button>
               </div>
@@ -170,6 +221,7 @@ export default function Dashboard() {
                 sort={sort}
                 onSort={handleSort}
                 showRank
+                tokenScaleId={tokenScaleId}
               />
 
               <Link className="btn btn-primary btn-block" to="/rankings" style={{ marginTop: 12 }}>

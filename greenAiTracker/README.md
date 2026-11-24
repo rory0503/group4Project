@@ -18,7 +18,6 @@ The React Compiler is not enabled on this template because of its impact on dev 
 cd greenAiTracker
 (possible install npm)
 npm run dev
-<<<<<<< HEAD
 -- then copy link into a search bar and then it should load or open in visual studio.
 
 
