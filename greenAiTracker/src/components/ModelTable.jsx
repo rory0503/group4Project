@@ -5,7 +5,7 @@ import { fmtInt } from "../lib/helpers";
 // Column definitions: key = field to sort by, label = heading, unit = small text under heading, right = right-align
 const COLS = [
   { key: "name", label: "Model", right: false },
-  { key: "water", label: "Water", unit: "Litres", right: true },
+  { key: "water", label: "Water", unit: "mL", right: true },
   { key: "co2", label: "CO₂", unit: "Metric tons", right: true },
   { key: "energy", label: "Energy", unit: "GWh", right: true },
   { key: "score", label: "Score", unit: "out of 12", right: true },
