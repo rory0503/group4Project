@@ -6,7 +6,7 @@ import { fmtInt } from "../lib/helpers";
 const COLS = [
   { key: "name", label: "Model", right: false },
   { key: "water", label: "Water", unit: "mL", right: true },
-  { key: "co2", label: "CO₂", unit: "Metric tons", right: true },
+  { key: "co2", label: "CO₂", unit: "Grams", right: true },
   { key: "energy", label: "Energy", unit: "GWh", right: true },
   { key: "score", label: "Score", unit: "out of 12", right: true },
 ];
