@@ -1,7 +1,7 @@
 // Downloads the given models as a CSV file the user can open in Excel.
 export default function exportCsv(list, filename = "green-ai-tracker-models.csv") {
   const head = ["Rank", "Model", "Company", "Water (mL)", "CO2 (g)", "Energy (GWh)", "Score (/12)"];
-  const rows = list.map((m) => [m.rank, m.name, m.company,m.water, m.co2, m.energy, m.score]);
+  const rows = list.map((m) => [m.rank, m.name, m.company, m.water, m.co2, m.energy, m.score]);
   const csv = [head, ...rows]
     .map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(","))
     .join("\r\n");
